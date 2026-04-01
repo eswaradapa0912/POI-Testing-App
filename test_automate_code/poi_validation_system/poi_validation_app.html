@@ -571,6 +571,272 @@
             width: 98px;
             flex-shrink: 0;
         }
+
+        .header-nav {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .header-nav-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .header-nav-btn:hover, .header-nav-btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: white;
+        }
+
+        /* Home analytics icon */
+        .home-actions {
+            display: flex;
+            gap: 0;
+            margin-top: 30px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .home-action-btn {
+            flex: 1;
+            padding: 20px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: #4a5568;
+        }
+
+        .home-action-btn:first-child {
+            border-right: 2px solid #e2e8f0;
+        }
+
+        .home-action-btn:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+        }
+
+        .home-action-btn .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-action-btn .action-icon.purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .home-action-btn .action-icon.teal {
+            background: linear-gradient(135deg, #38b2ac 0%, #2c7a7b 100%);
+            color: white;
+        }
+
+        /* Analytics Dashboard */
+        .analytics-screen {
+            display: none;
+        }
+
+        .analytics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .analytics-body {
+            padding: 30px;
+        }
+
+        .analytics-filter {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .analytics-filter label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .analytics-filter select {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .stats-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card.green { background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%); box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3); }
+        .stat-card.red { background: linear-gradient(135deg, #fc8181 0%, #c53030 100%); box-shadow: 0 4px 15px rgba(252, 129, 129, 0.3); }
+        .stat-card.orange { background: linear-gradient(135deg, #ed8936 0%, #c05621 100%); box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3); }
+
+        .stat-card .stat-number {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        .chart-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .chart-card h3 {
+            color: #4a5568;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .chart-canvas-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+            font-size: 0.85em;
+            color: #4a5568;
+        }
+
+        .chart-legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .comments-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .comments-section h3 {
+            color: #4a5568;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+        }
+
+        .comments-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            background: white;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .comment-item .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .comment-item .comment-poi {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .comment-item .comment-time {
+            color: #a0aec0;
+        }
+
+        .comment-item .comment-text {
+            color: #2d3748;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .comment-item .comment-correction {
+            margin-top: 6px;
+            font-size: 0.85em;
+            color: #e53e3e;
+            font-style: italic;
+        }
+
+        .no-comments {
+            text-align: center;
+            color: #a0aec0;
+            padding: 30px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -581,7 +847,20 @@
             <img src="/mycroft_logo.png" alt="Mycroft Logo" class="home-logo">
             <div class="home-title">Mycroft</div>
             <div class="home-tagline">The Authority that Confirms</div>
-            <button class="btn-enter" onclick="enterApp()">Get Started</button>
+            <div class="home-actions">
+                <button class="home-action-btn" onclick="enterApp()">
+                    <span class="action-icon purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    </span>
+                    Validation
+                </button>
+                <button class="home-action-btn" onclick="enterAnalytics()">
+                    <span class="action-icon teal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+                    </span>
+                    Analytics
+                </button>
+            </div>
         </div>
         <div class="home-quotes-bar">
             <div class="home-quote">
@@ -614,9 +893,14 @@
                     <span id="progressText">Loading POI data...</span>
                 </div>
             </div>
-            <div class="header-spacer"></div>
+            <div class="header-nav">
+                <button class="header-nav-btn active" id="navValidation" onclick="showValidationView()">Validation</button>
+                <button class="header-nav-btn" id="navAnalytics" onclick="showAnalyticsView()">Analytics</button>
+            </div>
         </div>
-        
+
+        <!-- Validation View -->
+        <div id="validationView">
         <div class="controls">
             <div class="filter-row" style="display: flex; gap: 12px; width: 100%; flex-wrap: wrap;">
                 <div class="filter-item" style="flex: 1; min-width: 150px;">
@@ -698,6 +982,10 @@
                         <div class="value" id="country"></div>
                     </div>
                     <div class="info-field">
+                        <label>Lat-Long:</label>
+                        <div class="value" id="latlong"></div>
+                    </div>
+                    <div class="info-field">
                         <label>Google Maps URL:</label>
                         <div class="value"><a id="gmaps_url" href="" target="_blank" class="link">View on Google Maps</a></div>
                     </div>
@@ -712,6 +1000,10 @@
                     <div class="info-field">
                         <label>Brand Method:</label>
                         <div class="value" id="brand_method"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Website Domain:</label>
+                        <div class="value" id="website_domain_name"></div>
                     </div>
                 </div>
                 
@@ -787,7 +1079,20 @@
                     <h3>Validation</h3>
                     <div class="validation-field">
                         <label>POI Type Validation:</label>
-                        <select id="poi_type_validation">
+                        <select id="poi_type_validation" onchange="onPoiTypeValidationChange()">
+                            <option value="">Select...</option>
+                            <option value="correct">Correct</option>
+                            <option value="incorrect">Incorrect</option>
+                        </select>
+                    </div>
+                    <div class="validation-field" id="correct_poi_type_field" style="display: none;">
+                        <label>Correct POI Type <span style="font-size: 0.8em; color: #a0aec0;">(optional)</span>:</label>
+                        <input type="text" id="correct_poi_type" placeholder="e.g. shop.food.grocery" style="width: 100%; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
+                        <a href="https://docs.google.com/spreadsheets/d/1-VqNQyuaRpHEEYtymN6xOMa976wntIHm6Fv6MFXLxW4/edit?gid=1337350158#gid=1337350158" target="_blank" style="font-size: 0.8em; color: #667eea; margin-top: 4px; display: inline-block;">View POI Types Reference Sheet</a>
+                    </div>
+                    <div class="validation-field">
+                        <label>Brand Validation:</label>
+                        <select id="brand_validation">
                             <option value="">Select...</option>
                             <option value="correct">Correct</option>
                             <option value="incorrect">Incorrect</option>
@@ -817,14 +1122,64 @@
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <img id="modalImage" src="" alt="Enlarged view">
+
+        <div id="bottomNav" style="display: none; padding: 16px 30px; background: #f8f9fa; border-top: 1px solid #dee2e6; justify-content: center; align-items: center; gap: 20px;">
+            <button class="btn btn-primary" id="btnPrevBottom" onclick="prevPOI()" style="height: 40px; min-width: 100px;" disabled>Previous</button>
+            <span id="poiCounterBottom" style="font-size: 14px; font-weight: 600; color: #4a5568; min-width: 120px; text-align: center;">0 / 0</span>
+            <button class="btn btn-primary" id="btnNextBottom" onclick="nextPOI()" style="height: 40px; min-width: 100px;" disabled>Next</button>
         </div>
-    </div>
+
+        <div id="imageModal" class="modal">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-content">
+                <img id="modalImage" src="" alt="Enlarged view">
+            </div>
+        </div>
+    </div><!-- end validationView -->
+
+    <!-- Analytics View -->
+    <div id="analyticsView" style="display: none;">
+        <div class="analytics-body">
+            <div class="analytics-filter">
+                <label>View:</label>
+                <select id="analyticsAssigneeFilter" onchange="renderAnalytics()">
+                    <option value="">Overall (All Assignees)</option>
+                </select>
+            </div>
+
+            <div class="stats-cards" id="statsCards"></div>
+
+            <div class="charts-grid" id="chartsGrid">
+                <div class="chart-card">
+                    <h3>POI Type Validation</h3>
+                    <div class="chart-canvas-wrap"><canvas id="chartPoiType" width="220" height="220"></canvas></div>
+                    <div class="chart-legend" id="legendPoiType"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Brand Validation</h3>
+                    <div class="chart-canvas-wrap"><canvas id="chartBrand" width="220" height="220"></canvas></div>
+                    <div class="chart-legend" id="legendBrand"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Polygon Area Validation</h3>
+                    <div class="chart-canvas-wrap"><canvas id="chartPolygonArea" width="220" height="220"></canvas></div>
+                    <div class="chart-legend" id="legendPolygonArea"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Polygon Validation</h3>
+                    <div class="chart-canvas-wrap"><canvas id="chartPolygon" width="220" height="220"></canvas></div>
+                    <div class="chart-legend" id="legendPolygon"></div>
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <h3>Comments & Issues</h3>
+                <div class="comments-list" id="commentsList"></div>
+            </div>
+        </div>
+    </div><!-- end analyticsView -->
+
+    </div><!-- end container -->
     </div><!-- end app-screen -->
 
     <script>
@@ -911,10 +1266,14 @@
 
                 updateProgressDisplay();
 
-                // Auto-load first POI if list is not empty
+                // Auto-load first unvalidated POI, or first POI if all are validated
                 if (allPOIData.length > 0) {
-                    currentIndex = 0;
-                    await loadPOIByIndex(0);
+                    const firstUnvalidated = allPOIData.findIndex(p => {
+                        const v = validationData[p.poi_code];
+                        return !v || !(v.poi_type_validation || v.brand_validation || v.polygon_area_validation || v.polygon_validation);
+                    });
+                    currentIndex = firstUnvalidated >= 0 ? firstUnvalidated : 0;
+                    await loadPOIByIndex(currentIndex);
                 } else {
                     currentIndex = -1;
                     document.getElementById('content').style.display = 'none';
@@ -929,12 +1288,26 @@
             const btnPrev = document.getElementById('btnPrev');
             const btnNext = document.getElementById('btnNext');
             const counter = document.getElementById('poiCounter');
+            const btnPrevB = document.getElementById('btnPrevBottom');
+            const btnNextB = document.getElementById('btnNextBottom');
+            const counterB = document.getElementById('poiCounterBottom');
+            const bottomNav = document.getElementById('bottomNav');
 
-            btnPrev.disabled = currentIndex <= 0;
-            btnNext.disabled = currentIndex >= allPOIData.length - 1;
-            counter.textContent = allPOIData.length > 0
+            const disablePrev = currentIndex <= 0;
+            const disableNext = currentIndex >= allPOIData.length - 1;
+            const label = allPOIData.length > 0
                 ? `${currentIndex + 1} / ${allPOIData.length}`
                 : '0 / 0';
+
+            btnPrev.disabled = disablePrev;
+            btnNext.disabled = disableNext;
+            counter.textContent = label;
+
+            btnPrevB.disabled = disablePrev;
+            btnNextB.disabled = disableNext;
+            counterB.textContent = label;
+
+            bottomNav.style.display = allPOIData.length > 0 ? 'flex' : 'none';
         }
 
         async function prevPOI() {
@@ -966,6 +1339,7 @@
                 const validation = validationData[poiCode];
                 return validation && (
                     validation.poi_type_validation ||
+                    validation.brand_validation ||
                     validation.polygon_area_validation ||
                     validation.polygon_validation
                 );
@@ -1004,6 +1378,9 @@
 
                 // Reset validation fields, then load existing if present
                 document.getElementById('poi_type_validation').value = '';
+                document.getElementById('correct_poi_type').value = '';
+                document.getElementById('correct_poi_type_field').style.display = 'none';
+                document.getElementById('brand_validation').value = '';
                 document.getElementById('polygon_area_validation').value = '';
                 document.getElementById('polygon_validation').value = '';
                 document.getElementById('comments').value = '';
@@ -1012,9 +1389,12 @@
                 if (validationData[poiCode]) {
                     const validation = validationData[poiCode];
                     document.getElementById('poi_type_validation').value = validation.poi_type_validation || '';
+                    document.getElementById('correct_poi_type').value = validation.correct_poi_type || '';
+                    document.getElementById('brand_validation').value = validation.brand_validation || '';
                     document.getElementById('polygon_area_validation').value = validation.polygon_area_validation || '';
                     document.getElementById('polygon_validation').value = validation.polygon_validation || '';
                     document.getElementById('comments').value = validation.comments || '';
+                    onPoiTypeValidationChange();
                 }
 
                 document.getElementById('loading').classList.remove('active');
@@ -1033,7 +1413,12 @@
             document.getElementById('address').textContent = data.address || 'N/A';
             document.getElementById('district_code').textContent = data.district_code || 'N/A';
             document.getElementById('country').textContent = data.country || 'N/A';
-            
+
+            // Lat-Long
+            const lat = data.latitude != null ? data.latitude : null;
+            const lng = data.longitude != null ? data.longitude : null;
+            document.getElementById('latlong').textContent = (lat != null && lng != null) ? `${lat}, ${lng}` : 'N/A';
+
             const gmapsLink = document.getElementById('gmaps_url');
             if (data.gmaps_url) {
                 gmapsLink.href = data.gmaps_url;
@@ -1045,6 +1430,7 @@
             // Brand Information
             document.getElementById('brands').textContent = data.brands || 'N/A';
             document.getElementById('brand_method').textContent = data.brand_method || 'N/A';
+            document.getElementById('website_domain_name').textContent = data.website_domain_name || 'N/A';
             
             // POI Type Information
             document.getElementById('poi_type').textContent = data.poi_type || 'N/A';
@@ -1162,9 +1548,12 @@
             statusEl.textContent = 'Saving...';
             statusEl.style.color = '#667eea';
 
+            const poiTypeVal = document.getElementById('poi_type_validation').value;
             const validation = {
                 poi_code: currentPOI.poi_code,
-                poi_type_validation: document.getElementById('poi_type_validation').value,
+                poi_type_validation: poiTypeVal,
+                correct_poi_type: poiTypeVal === 'incorrect' ? document.getElementById('correct_poi_type').value : '',
+                brand_validation: document.getElementById('brand_validation').value,
                 polygon_area_validation: document.getElementById('polygon_area_validation').value,
                 polygon_validation: document.getElementById('polygon_validation').value,
                 comments: document.getElementById('comments').value,
@@ -1207,8 +1596,21 @@
             }
         }
 
+        function onPoiTypeValidationChange() {
+            const val = document.getElementById('poi_type_validation').value;
+            const field = document.getElementById('correct_poi_type_field');
+            if (val === 'incorrect') {
+                field.style.display = 'block';
+            } else {
+                field.style.display = 'none';
+                document.getElementById('correct_poi_type').value = '';
+            }
+        }
+
         function setupAutoSaveListeners() {
             document.getElementById('poi_type_validation').addEventListener('change', () => triggerAutoSave(true));
+            document.getElementById('correct_poi_type').addEventListener('input', () => triggerAutoSave(false));
+            document.getElementById('brand_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('polygon_area_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('polygon_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('comments').addEventListener('input', () => triggerAutoSave(false));
@@ -1276,9 +1678,173 @@
             }
         });
         
+        // ===== Analytics Dashboard =====
+        let analyticsData = null;
+
+        function showValidationView() {
+            document.getElementById('validationView').style.display = 'block';
+            document.getElementById('analyticsView').style.display = 'none';
+            document.getElementById('navValidation').classList.add('active');
+            document.getElementById('navAnalytics').classList.remove('active');
+        }
+
+        function showAnalyticsView() {
+            document.getElementById('validationView').style.display = 'none';
+            document.getElementById('analyticsView').style.display = 'block';
+            document.getElementById('navValidation').classList.remove('active');
+            document.getElementById('navAnalytics').classList.add('active');
+            loadAnalytics();
+        }
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/analytics');
+                analyticsData = await response.json();
+
+                // Populate assignee dropdown
+                const sel = document.getElementById('analyticsAssigneeFilter');
+                sel.innerHTML = '<option value="">Overall (All Assignees)</option>';
+                (analyticsData.assignees || []).forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a;
+                    opt.textContent = a;
+                    sel.appendChild(opt);
+                });
+
+                renderAnalytics();
+            } catch (err) {
+                console.error('Error loading analytics:', err);
+            }
+        }
+
+        function renderAnalytics() {
+            if (!analyticsData) return;
+
+            const assignee = document.getElementById('analyticsAssigneeFilter').value;
+            const stats = assignee ? analyticsData.per_assignee[assignee] : analyticsData.overall;
+
+            if (!stats) return;
+
+            // Stat cards
+            const pct = stats.total > 0 ? Math.round((stats.tested / stats.total) * 100) : 0;
+            document.getElementById('statsCards').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total}</div>
+                    <div class="stat-label">Total POIs</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-number">${stats.tested}</div>
+                    <div class="stat-label">Tested (${pct}%)</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-number">${stats.untested_count}</div>
+                    <div class="stat-label">Untested</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-number">${stats.poi_type.incorrect + stats.brand.incorrect + stats.polygon_area.incorrect + stats.polygon.incorrect}</div>
+                    <div class="stat-label">Total Incorrect</div>
+                </div>
+            `;
+
+            // Draw donut charts
+            drawDonut('chartPoiType', 'legendPoiType', stats.poi_type);
+            drawDonut('chartBrand', 'legendBrand', stats.brand);
+            drawDonut('chartPolygonArea', 'legendPolygonArea', stats.polygon_area);
+            drawDonut('chartPolygon', 'legendPolygon', stats.polygon);
+
+            // Comments
+            const commentsEl = document.getElementById('commentsList');
+            if (stats.comments.length === 0) {
+                commentsEl.innerHTML = '<div class="no-comments">No comments yet</div>';
+            } else {
+                commentsEl.innerHTML = stats.comments.map(c => `
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <span class="comment-poi">${c.name}</span>
+                            <span class="comment-time">${c.timestamp ? new Date(c.timestamp).toLocaleString() : ''}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(c.comment)}</div>
+                        ${c.correct_poi_type ? `<div class="comment-correction">Suggested POI Type: ${escapeHtml(c.correct_poi_type)}</div>` : ''}
+                    </div>
+                `).join('');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function drawDonut(canvasId, legendId, data) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2;
+            const outerR = Math.min(w, h) / 2 - 10;
+            const innerR = outerR * 0.55;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const segments = [
+                { label: 'Correct', value: data.correct, color: '#48bb78' },
+                { label: 'Incorrect', value: data.incorrect, color: '#fc8181' },
+                { label: 'Untested', value: data.untested, color: '#e2e8f0' }
+            ];
+
+            const total = segments.reduce((s, seg) => s + seg.value, 0);
+
+            if (total === 0) {
+                // Draw empty ring
+                ctx.beginPath();
+                ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+                ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fill();
+            } else {
+                let startAngle = -Math.PI / 2;
+                segments.forEach(seg => {
+                    if (seg.value === 0) return;
+                    const sliceAngle = (seg.value / total) * Math.PI * 2;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
+                    ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
+                    ctx.closePath();
+                    ctx.fillStyle = seg.color;
+                    ctx.fill();
+                    startAngle += sliceAngle;
+                });
+            }
+
+            // Center text
+            ctx.fillStyle = '#2d3748';
+            ctx.font = 'bold 28px Segoe UI, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const pct = total > 0 ? Math.round(((data.correct) / total) * 100) : 0;
+            ctx.fillText(pct + '%', cx, cy - 8);
+            ctx.font = '12px Segoe UI, sans-serif';
+            ctx.fillStyle = '#718096';
+            ctx.fillText('correct', cx, cy + 14);
+
+            // Legend
+            document.getElementById(legendId).innerHTML = segments.map(seg =>
+                `<span><span class="legend-dot" style="background:${seg.color}"></span>${seg.label}: ${seg.value}</span>`
+            ).join('');
+        }
+
         function enterApp() {
             document.getElementById('homeScreen').style.display = 'none';
             document.getElementById('appScreen').style.display = 'block';
+            showValidationView();
+            initApp();
+            setupAutoSaveListeners();
+        }
+
+        function enterAnalytics() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            showAnalyticsView();
             initApp();
             setupAutoSaveListeners();
         }

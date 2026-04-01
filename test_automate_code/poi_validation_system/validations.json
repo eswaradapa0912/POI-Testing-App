@@ -18,10 +18,12 @@
   "POI_USA_9999_0x14e04aa43ff38475:0x6bf9f3280efe864": {
     "poi_code": "POI_USA_9999_0x14e04aa43ff38475:0x6bf9f3280efe864",
     "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "",
     "polygon_area_validation": "incorrect",
     "polygon_validation": "incorrect",
     "comments": "",
-    "timestamp": "2026-04-01T09:53:39.727Z"
+    "timestamp": "2026-04-01T10:45:47.910Z"
   },
   "POI_USA_9999_0x22d95c7a6449148d:0xc0dd2a1d70dbcfb2": {
     "poi_code": "POI_USA_9999_0x22d95c7a6449148d:0xc0dd2a1d70dbcfb2",
@@ -78,5 +80,63 @@
     "polygon_validation": "correct",
     "comments": "",
     "timestamp": "2026-04-01T10:06:59.881Z"
+  },
+  "POI_USA_9999_0x1525c5670460da1b:0xc29966d636aca774": {
+    "poi_code": "POI_USA_9999_0x1525c5670460da1b:0xc29966d636aca774",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:36:54.754Z"
+  },
+  "POI_USA_9999_0x14e19dd0b8ffae75:0x623d664a07ffc49c": {
+    "poi_code": "POI_USA_9999_0x14e19dd0b8ffae75:0x623d664a07ffc49c",
+    "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "incorrect",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "incorrect",
+    "comments": "The given POI name is \"Mangan Power Distribution Group\"\nAs you can see the lat long distance is too high \nThe polygon and address which is marked here are for \"Mangan Power Distribution Group\" and Mangan Inc is a different poi place , just that both the POI shared same Company name just the department are different.",
+    "timestamp": "2026-04-01T11:02:03.352Z"
+  },
+  "POI_USA_9999_0x60a2e5164a79c337:0x26e2769084d2c4c6": {
+    "poi_code": "POI_USA_9999_0x60a2e5164a79c337:0x26e2769084d2c4c6",
+    "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T11:00:12.966Z"
+  },
+  "POI_USA_9999_0x6477ac56166bd47:0x9fb5888186d5696a": {
+    "poi_code": "POI_USA_9999_0x6477ac56166bd47:0x9fb5888186d5696a",
+    "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T11:01:56.103Z"
+  },
+  "POI_USA_9999_0x6e42c2afc2ea13af:0xfd35badb334973e2": {
+    "poi_code": "POI_USA_9999_0x6e42c2afc2ea13af:0xfd35badb334973e2",
+    "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T11:03:00.643Z"
+  },
+  "POI_USA_9999_0x80c25a57695a40d7:0x4f6d87d43886d2c8": {
+    "poi_code": "POI_USA_9999_0x80c25a57695a40d7:0x4f6d87d43886d2c8",
+    "poi_type_validation": "correct",
+    "correct_poi_type": "",
+    "brand_validation": "",
+    "polygon_area_validation": "incorrect",
+    "polygon_validation": "incorrect",
+    "comments": "the issue is here they sell pumki",
+    "timestamp": "2026-04-01T11:27:39.283Z"
   }
 }

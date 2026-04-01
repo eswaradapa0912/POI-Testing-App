@@ -43,10 +43,11 @@ kepler_process = None  # Track the running Kepler dev server
 
 # Required fields from input CSV
 INPUT_FIELDS = [
-    'poi_code', 'name', 'address', 'district_code', 'country', 'gmaps_url',
+    'poi_code', 'name', 'address', 'district_code', 'country', 'latitude', 'longitude', 'gmaps_url',
     'brands', 'brand_method', 'poi_type', 'category_poi_types', 
     'poi_type_cumulative', 'final_poitype_distilbert', 'final_confidence_distilbert',
-    'google_category_tags', 'area_tag', 'polygon_area_sqm', 'parent_polygon_area_sqm'
+    'google_category_tags', 'area_tag', 'polygon_area_sqm', 'parent_polygon_area_sqm',
+    'website_domain_name'
 ]
 
 # Required fields from output CSV
@@ -350,11 +351,13 @@ def update_excel_report():
         
         # Add validation columns
         df['poi_type_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('poi_type_validation', ''))
+        df['correct_poi_type'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('correct_poi_type', ''))
+        df['brand_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('brand_validation', ''))
         df['polygon_area_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_area_validation', ''))
         df['polygon_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_validation', ''))
         df['validation_comments'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('comments', ''))
         df['validation_timestamp'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('timestamp', ''))
-        
+
         # Create Excel writer
         with pd.ExcelWriter(EXCEL_OUTPUT, engine='openpyxl') as writer:
             # Write main data
@@ -394,7 +397,7 @@ def update_excel_report():
             validation_fill_correct = PatternFill(start_color='C6EFCE', end_color='C6EFCE', fill_type='solid')
             validation_fill_incorrect = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
             
-            validation_cols = ['poi_type_validation', 'polygon_area_validation', 'polygon_validation']
+            validation_cols = ['poi_type_validation', 'brand_validation', 'polygon_area_validation', 'polygon_validation']
             for col_name in validation_cols:
                 if col_name in df.columns:
                     col_idx = df.columns.get_loc(col_name) + 1
@@ -412,6 +415,8 @@ def update_excel_report():
                     'POIs Validated',
                     'POI Type - Correct',
                     'POI Type - Incorrect',
+                    'Brand - Correct',
+                    'Brand - Incorrect',
                     'Polygon Area - Correct',
                     'Polygon Area - Incorrect',
                     'Polygon - Correct',
@@ -419,9 +424,11 @@ def update_excel_report():
                 ],
                 'Count': [
                     len(df),
-                    len([v for v in validations.values() if any([v.get('poi_type_validation'), v.get('polygon_area_validation'), v.get('polygon_validation')])]),
+                    len([v for v in validations.values() if any([v.get('poi_type_validation'), v.get('brand_validation'), v.get('polygon_area_validation'), v.get('polygon_validation')])]),
                     len([v for v in validations.values() if v.get('poi_type_validation') == 'correct']),
                     len([v for v in validations.values() if v.get('poi_type_validation') == 'incorrect']),
+                    len([v for v in validations.values() if v.get('brand_validation') == 'correct']),
+                    len([v for v in validations.values() if v.get('brand_validation') == 'incorrect']),
                     len([v for v in validations.values() if v.get('polygon_area_validation') == 'correct']),
                     len([v for v in validations.values() if v.get('polygon_area_validation') == 'incorrect']),
                     len([v for v in validations.values() if v.get('polygon_validation') == 'correct']),
@@ -459,19 +466,22 @@ def update_google_sheets_csv():
         
         # Add validation columns
         df['poi_type_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('poi_type_validation', ''))
+        df['correct_poi_type'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('correct_poi_type', ''))
+        df['brand_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('brand_validation', ''))
         df['polygon_area_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_area_validation', ''))
         df['polygon_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_validation', ''))
         df['validation_comments'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('comments', ''))
         df['validation_timestamp'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('timestamp', ''))
         df['validator_name'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('validator', 'System'))
-        
+
         # Select key columns for Google Sheets (avoid overwhelming with too many columns)
         google_sheets_columns = [
-            'poi_code', 'name', 'address', 'district_code', 'country', 
+            'poi_code', 'name', 'address', 'district_code', 'country',
             'poi_type', 'final_poitype_distilbert', 'final_confidence_distilbert',
             'polygon_area_sqm', 'area_tag',
             'name_match_pct', 'address_match_pct', 'distance_from_latlong_m', 'location_status_match',
-            'poi_type_validation', 'polygon_area_validation', 'polygon_validation', 
+            'poi_type_validation', 'correct_poi_type', 'brand_validation',
+            'polygon_area_validation', 'polygon_validation',
             'validation_comments', 'validation_timestamp', 'validator_name'
         ]
         
@@ -492,6 +502,81 @@ def update_google_sheets_csv():
         
     except Exception as e:
         print(f"Error updating Google Sheets CSV: {e}")
+
+
+@app.route('/api/analytics')
+def get_analytics():
+    """Get analytics data for the dashboard"""
+    df = load_poi_data()
+    if df.empty:
+        return jsonify({'error': 'No data available'}), 404
+
+    validations = load_validations()
+    config = load_config()
+    assignees = config.get('assignees', [])
+
+    all_poi_codes = df['poi_code'].tolist()
+    all_poi_names = {row['poi_code']: row['name'] if pd.notna(row['name']) else 'Unknown'
+                     for _, row in df.iterrows()}
+
+    def compute_stats(poi_codes):
+        total = len(poi_codes)
+        tested = 0
+        stats = {
+            'total': total,
+            'poi_type': {'correct': 0, 'incorrect': 0, 'untested': 0},
+            'brand': {'correct': 0, 'incorrect': 0, 'untested': 0},
+            'polygon_area': {'correct': 0, 'incorrect': 0, 'untested': 0},
+            'polygon': {'correct': 0, 'incorrect': 0, 'untested': 0},
+            'comments': []
+        }
+        for pc in poi_codes:
+            v = validations.get(pc, {})
+            has_any = bool(v.get('poi_type_validation') or v.get('brand_validation')
+                          or v.get('polygon_area_validation') or v.get('polygon_validation'))
+            if has_any:
+                tested += 1
+
+            for key, field in [('poi_type', 'poi_type_validation'), ('brand', 'brand_validation'),
+                               ('polygon_area', 'polygon_area_validation'), ('polygon', 'polygon_validation')]:
+                val = v.get(field, '')
+                if val == 'correct':
+                    stats[key]['correct'] += 1
+                elif val == 'incorrect':
+                    stats[key]['incorrect'] += 1
+                else:
+                    stats[key]['untested'] += 1
+
+            comment = v.get('comments', '').strip()
+            if comment:
+                stats['comments'].append({
+                    'poi_code': pc,
+                    'name': all_poi_names.get(pc, 'Unknown'),
+                    'comment': comment,
+                    'timestamp': v.get('timestamp', ''),
+                    'correct_poi_type': v.get('correct_poi_type', '')
+                })
+
+        stats['tested'] = tested
+        stats['untested_count'] = total - tested
+        return stats
+
+    # Overall stats
+    overall = compute_stats(all_poi_codes)
+
+    # Per-assignee stats
+    per_assignee = {}
+    if assignees:
+        sorted_codes = sorted(all_poi_codes)
+        for i, assignee in enumerate(assignees):
+            assignee_codes = [sorted_codes[j] for j in range(len(sorted_codes)) if j % len(assignees) == i]
+            per_assignee[assignee] = compute_stats(assignee_codes)
+
+    return jsonify({
+        'overall': overall,
+        'per_assignee': per_assignee,
+        'assignees': assignees
+    })
 
 
 def fetch_poi_polygon_from_trino(poi_code):
