@@ -14,5 +14,69 @@
     "polygon_validation": "incorrect",
     "comments": "",
     "timestamp": "2026-04-01T03:42:51.095Z"
+  },
+  "POI_USA_9999_0x14e04aa43ff38475:0x6bf9f3280efe864": {
+    "poi_code": "POI_USA_9999_0x14e04aa43ff38475:0x6bf9f3280efe864",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "incorrect",
+    "polygon_validation": "incorrect",
+    "comments": "",
+    "timestamp": "2026-04-01T09:53:39.727Z"
+  },
+  "POI_USA_9999_0x22d95c7a6449148d:0xc0dd2a1d70dbcfb2": {
+    "poi_code": "POI_USA_9999_0x22d95c7a6449148d:0xc0dd2a1d70dbcfb2",
+    "poi_type_validation": "incorrect",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T09:56:50.764Z"
+  },
+  "POI_USA_9999_0x41aac102782f975b:0xac14574bd37b916b": {
+    "poi_code": "POI_USA_9999_0x41aac102782f975b:0xac14574bd37b916b",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "incorrect",
+    "polygon_validation": "incorrect",
+    "comments": "",
+    "timestamp": "2026-04-01T10:00:37.247Z"
+  },
+  "POI_USA_9999_0x4e024e806ecaf29d:0x6e65c21f7c15e63": {
+    "poi_code": "POI_USA_9999_0x4e024e806ecaf29d:0x6e65c21f7c15e63",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:02:25.390Z"
+  },
+  "POI_USA_9999_0x53487b2f96783d51:0x633ef191b718e2b5": {
+    "poi_code": "POI_USA_9999_0x53487b2f96783d51:0x633ef191b718e2b5",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:03:04.883Z"
+  },
+  "POI_USA_9999_0x54cd0035480ae821:0xa57cb8c50cec1d41": {
+    "poi_code": "POI_USA_9999_0x54cd0035480ae821:0xa57cb8c50cec1d41",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:04:23.161Z"
+  },
+  "POI_USA_9999_0x54d2c3b5175345d7:0xb8c1bbaafc363365": {
+    "poi_code": "POI_USA_9999_0x54d2c3b5175345d7:0xb8c1bbaafc363365",
+    "poi_type_validation": "incorrect",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:06:23.481Z"
+  },
+  "POI_USA_9999_0x54d2ed1fad5ccf83:0x3ba147232bbffc2": {
+    "poi_code": "POI_USA_9999_0x54d2ed1fad5ccf83:0x3ba147232bbffc2",
+    "poi_type_validation": "correct",
+    "polygon_area_validation": "correct",
+    "polygon_validation": "correct",
+    "comments": "",
+    "timestamp": "2026-04-01T10:06:59.881Z"
   }
 }

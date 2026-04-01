@@ -9,6 +9,8 @@ from flask_cors import CORS
 import pandas as pd
 import json
 import os
+import subprocess
+import signal
 from datetime import datetime
 import glob
 import ast
@@ -16,6 +18,8 @@ from pathlib import Path
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+import trino
+from trino.auth import BasicAuthentication
 
 app = Flask(__name__)
 CORS(app)
@@ -27,8 +31,15 @@ OUTPUT_CSV = BASE_DIR / "output" / "poi_extracted.csv"
 SCREENSHOTS_DISPLAY = BASE_DIR / "output" / "screenshots_with_display"
 SCREENSHOTS_KEPLER = BASE_DIR / "output" / "screenshots_kepler"
 VALIDATION_FILE = BASE_DIR / "validations.json"
+CONFIG_FILE = BASE_DIR / "config.json"
 EXCEL_OUTPUT = BASE_DIR / "output" / "poi_validation_report.xlsx"
 GOOGLE_SHEETS_CSV = BASE_DIR / "output" / "poi_validation_google_sheets.csv"
+
+# Kepler configuration
+KEPLER_VITE_DIR = Path("/mnt/data/POI_Testing_Automation/version=5_0_2/get-started-vite")
+KEPLER_OUTPUT_JSON = KEPLER_VITE_DIR / "src" / "output.json"
+KEPLER_PORT = 8082
+kepler_process = None  # Track the running Kepler dev server
 
 # Required fields from input CSV
 INPUT_FIELDS = [
@@ -40,8 +51,8 @@ INPUT_FIELDS = [
 
 # Required fields from output CSV
 OUTPUT_FIELDS = [
-    'name_match_pct', 'address_match_pct', 'distance_from_latlong_m', 
-    'location_status_match'
+    'name_match_pct', 'address_match_pct', 'distance_from_latlong_m',
+    'location_status_match', 'ratings_diff'
 ]
 
 def safe_parse_list(value):
@@ -120,25 +131,97 @@ def save_validations(validations):
     with open(VALIDATION_FILE, 'w') as f:
         json.dump(validations, f, indent=2)
 
+def load_config():
+    """Load config from JSON file"""
+    if CONFIG_FILE.exists():
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {"assignees": []}
+    return {"assignees": []}
+
 @app.route('/')
 def index():
     """Serve the main HTML page"""
     return send_file(BASE_DIR / 'poi_validation_app.html')
 
-@app.route('/api/poi_list')
-def get_poi_list():
-    """Get list of all POIs"""
+@app.route('/logo.svg')
+def serve_logo():
+    """Serve the Sherlock logo SVG"""
+    return send_file(BASE_DIR / 'sherlockLogo.svg', mimetype='image/svg+xml')
+
+@app.route('/mycroft_logo.png')
+def serve_mycroft_logo():
+    """Serve the Mycroft logo PNG"""
+    return send_file(BASE_DIR / 'MyCroft_logo.png', mimetype='image/png')
+
+@app.route('/api/config')
+def get_config():
+    """Get configuration including assignee list"""
+    return jsonify(load_config())
+
+@app.route('/api/filters')
+def get_filters():
+    """Get unique values for filter dropdowns"""
     df = load_poi_data()
     if df.empty:
         return jsonify({'error': 'No data available'}), 404
-    
+
+    countries = sorted(df['country'].dropna().unique().tolist())
+    poi_types = sorted(df['poi_type'].dropna().unique().tolist())
+
+    # Extract level1 from poi_type (first segment before the dot)
+    level1_values = sorted(
+        df['poi_type'].dropna().apply(lambda x: str(x).split('.')[0]).unique().tolist()
+    )
+
+    return jsonify({
+        'countries': countries,
+        'poi_types': poi_types,
+        'level1_values': level1_values
+    })
+
+@app.route('/api/poi_list')
+def get_poi_list():
+    """Get list of all POIs with optional filtering"""
+    df = load_poi_data()
+    if df.empty:
+        return jsonify({'error': 'No data available'}), 404
+
+    # Apply filters from query params
+    country = request.args.get('country', '')
+    poi_type = request.args.get('poi_type', '')
+    level1 = request.args.get('level1', '')
+    assignee = request.args.get('assignee', '')
+
+    if country:
+        df = df[df['country'] == country]
+
+    if level1:
+        df = df[df['poi_type'].fillna('').apply(lambda x: str(x).split('.')[0]) == level1]
+
+    if poi_type:
+        df = df[df['poi_type'] == poi_type]
+
+    # Apply assignee split — deterministic split based on sorted poi_codes
+    if assignee:
+        config = load_config()
+        assignees = config.get('assignees', [])
+        if assignees and assignee in assignees:
+            assignee_index = assignees.index(assignee)
+            num_assignees = len(assignees)
+            # Sort by poi_code for deterministic split
+            df = df.sort_values('poi_code').reset_index(drop=True)
+            df = df[df.index % num_assignees == assignee_index]
+
     poi_list = []
     for _, row in df.iterrows():
         poi_list.append({
             'poi_code': row['poi_code'],
             'name': row['name'] if pd.notna(row['name']) else 'Unknown'
         })
-    
+
     return jsonify({'poi_list': poi_list})
 
 @app.route('/api/poi_data/<poi_code>')
@@ -411,10 +494,114 @@ def update_google_sheets_csv():
         print(f"Error updating Google Sheets CSV: {e}")
 
 
+def fetch_poi_polygon_from_trino(poi_code):
+    """Query Trino for a single POI's polygon data"""
+    conn = trino.dbapi.connect(
+        host='prestoazure.infiniteanalytics.com',
+        port=443,
+        user='application',
+        catalog='delta',
+        schema='default',
+        auth=BasicAuthentication('application', 'knob#or53RainEin5teinTom168'),
+        http_scheme='https',
+        client_tags=['test']
+    )
+    cursor = conn.cursor()
+    query = f"""
+    SELECT poi_code, polygon, latitude, longitude, name, address
+    FROM poi_data_5_0_10
+    WHERE poi_code = '{poi_code}'
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    column_names = [desc[0] for desc in cursor.description]
+    cursor.close()
+    conn.close()
+
+    if not results:
+        return None
+
+    df = pd.DataFrame(results, columns=column_names)
+    return df.to_dict(orient="records")
+
+
+def is_kepler_running():
+    """Check if the Kepler Vite dev server is running on the expected port"""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', KEPLER_PORT)) == 0
+
+
+def start_kepler_server():
+    """Start the Kepler Vite dev server if not already running"""
+    global kepler_process
+    if is_kepler_running():
+        print(f"Kepler dev server already running on port {KEPLER_PORT}")
+        return True
+
+    try:
+        print(f"Starting Kepler dev server in {KEPLER_VITE_DIR}...")
+        kepler_process = subprocess.Popen(
+            ['pnpm', 'dev', '--host'],
+            cwd=str(KEPLER_VITE_DIR),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            preexec_fn=os.setsid
+        )
+        # Wait a bit for the server to start
+        import time
+        for _ in range(30):
+            time.sleep(1)
+            if is_kepler_running():
+                print(f"Kepler dev server started on port {KEPLER_PORT}")
+                return True
+        print("Kepler dev server failed to start within 30 seconds")
+        return False
+    except Exception as e:
+        print(f"Error starting Kepler dev server: {e}")
+        return False
+
+
+@app.route('/api/open_kepler/<poi_code>', methods=['POST'])
+def open_kepler(poi_code):
+    """Fetch polygon data for a POI from Trino, write to output.json, and start Kepler"""
+    try:
+        # Step 1: Fetch polygon data from Trino
+        print(f"Fetching polygon data for {poi_code} from Trino...")
+        poi_data = fetch_poi_polygon_from_trino(poi_code)
+
+        if not poi_data:
+            return jsonify({'error': f'No polygon data found for {poi_code} in Trino'}), 404
+
+        # Step 2: Write to output.json for the Kepler Vite app
+        with open(KEPLER_OUTPUT_JSON, 'w') as f:
+            json.dump(poi_data, f, indent=2)
+        print(f"Wrote {len(poi_data)} records to {KEPLER_OUTPUT_JSON}")
+
+        # Step 3: Start Kepler dev server if not running
+        kepler_started = start_kepler_server()
+
+        if not kepler_started:
+            return jsonify({
+                'error': 'Could not start Kepler dev server. Please start it manually: cd get-started-vite && pnpm dev'
+            }), 500
+
+        kepler_url = f"http://localhost:{KEPLER_PORT}"
+        return jsonify({
+            'success': True,
+            'message': f'Kepler ready for {poi_code}',
+            'kepler_url': kepler_url
+        })
+
+    except Exception as e:
+        print(f"Error opening Kepler for {poi_code}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     # Ensure output directory exists
     (BASE_DIR / "output").mkdir(exist_ok=True)
-    
+
     print(f"Starting POI Validation Server...")
     print(f"Base directory: {BASE_DIR}")
     print(f"Input CSV: {INPUT_CSV}")
@@ -423,5 +610,5 @@ if __name__ == '__main__':
     print(f"Screenshots Kepler: {SCREENSHOTS_KEPLER}")
     print(f"\nServer running at http://localhost:5002")
     print("Open your browser and navigate to http://localhost:5002 to use the application")
-    
+
     app.run(debug=True, host='0.0.0.0', port=5002)

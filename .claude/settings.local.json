@@ -4,7 +4,10 @@
       "Bash(chmod +x /mnt/data/POI_Testing_Automation/version=5_0_2/test_automate_code/run_poi_validation.sh)",
       "Bash(pip3 install flask flask-cors pandas openpyxl --quiet)",
       "Bash(lsof -i :5000)",
-      "Bash(python3 poi_validation_server.py)"
+      "Bash(python3 poi_validation_server.py)",
+      "Bash(python3 -c \":*)",
+      "Bash(python3:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
