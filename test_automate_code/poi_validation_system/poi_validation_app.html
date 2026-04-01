@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POI Validation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .poi-selector {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .poi-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .poi-validated {
+            background-color: #c6f6d5 !important;
+            color: #22543d !important;
+            font-weight: 600;
+        }
+        
+        .poi-not-validated {
+            background-color: #ffffff !important;
+            color: #2d3748 !important;
+        }
+        
+        .validation-status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .status-validated {
+            background-color: #48bb78;
+            color: white;
+        }
+        
+        .status-not-validated {
+            background-color: #cbd5e0;
+            color: #4a5568;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #3182ce;
+        }
+        
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .screenshots {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .screenshot-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .screenshot-container h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .screenshot-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .screenshot-container img:hover {
+            transform: scale(1.02);
+        }
+        
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .section-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section-card h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .info-field {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-field label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+        
+        .info-field .value {
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            color: #2d3748;
+            word-wrap: break-word;
+        }
+        
+        .info-field .link {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .info-field .link:hover {
+            text-decoration: underline;
+        }
+        
+        .list-value {
+            background: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            display: inline-block;
+        }
+        
+        .validation-section {
+            background: #fef5e7;
+            border: 2px solid #f39c12;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .validation-section h3 {
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+        
+        .validation-field {
+            margin-bottom: 20px;
+        }
+        
+        .validation-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        
+        .validation-field select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #f39c12;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .comment-section {
+            margin-top: 20px;
+        }
+        
+        .comment-section textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .comment-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .save-button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #667eea;
+        }
+        
+        .match-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        
+        .match-high {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .match-medium {
+            background: #fed7aa;
+            color: #7c2d12;
+        }
+        
+        .match-low {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>POI Validation System</h1>
+            <p>Review and validate POI data with screenshots</p>
+            <div id="validationProgress" style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                <span id="progressText">Loading POI data...</span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="poi-selector">
+                <select id="poiSelect">
+                    <option value="">Select a POI...</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="loadPOI()">Load POI</button>
+            <button class="btn btn-success" onclick="saveValidation()">Save Validation</button>
+            <button class="btn btn-info" onclick="exportToExcel()">Export to Excel</button>
+            <button class="btn btn-info" onclick="exportToGoogleSheets()">Export to CSV (Google Sheets)</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; color: #667eea; font-weight: 600;">Loading POI data...</p>
+        </div>
+        
+        <div class="content" id="content" style="display: none;">
+            <div class="screenshots">
+                <div class="screenshot-container">
+                    <h3>Screenshot with Display</h3>
+                    <img id="screenshotDisplay" src="" alt="Screenshot with display" onclick="openModal(this)">
+                </div>
+                <div class="screenshot-container">
+                    <h3>Screenshot Kepler</h3>
+                    <img id="screenshotKepler" src="" alt="Screenshot kepler" onclick="openModal(this)">
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="section-card">
+                    <h2>Generic Information</h2>
+                    <div class="info-field">
+                        <label>POI Code:</label>
+                        <div class="value" id="poi_code"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Name:</label>
+                        <div class="value" id="name"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Address:</label>
+                        <div class="value" id="address"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>District Code:</label>
+                        <div class="value" id="district_code"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Country:</label>
+                        <div class="value" id="country"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Google Maps URL:</label>
+                        <div class="value"><a id="gmaps_url" href="" target="_blank" class="link">View on Google Maps</a></div>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <h2>Brand Information</h2>
+                    <div class="info-field">
+                        <label>Brands:</label>
+                        <div class="value" id="brands"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Brand Method:</label>
+                        <div class="value" id="brand_method"></div>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <h2>POI Type Information</h2>
+                    <div class="info-field">
+                        <label>POI Type:</label>
+                        <div class="value" id="poi_type"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Category POI Types:</label>
+                        <div class="value" id="category_poi_types"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>POI Type Cumulative:</label>
+                        <div class="value" id="poi_type_cumulative"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Final POI Type (DistilBERT):</label>
+                        <div class="value" id="final_poitype_distilbert"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Confidence (DistilBERT):</label>
+                        <div class="value" id="final_confidence_distilbert"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Google Category Tags:</label>
+                        <div class="value" id="google_category_tags"></div>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <h2>Polygon Information</h2>
+                    <div class="info-field">
+                        <label>Area Tag:</label>
+                        <div class="value" id="area_tag"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Polygon Area (sqm):</label>
+                        <div class="value" id="polygon_area_sqm"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Parent Polygon Area (sqm):</label>
+                        <div class="value" id="parent_polygon_area_sqm"></div>
+                    </div>
+                </div>
+                
+                <div class="section-card">
+                    <h2>Matching Metrics</h2>
+                    <div class="info-field">
+                        <label>Name Match:</label>
+                        <div class="value" id="name_match_pct"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Address Match:</label>
+                        <div class="value" id="address_match_pct"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Distance from LatLong (m):</label>
+                        <div class="value" id="distance_from_latlong_m"></div>
+                    </div>
+                    <div class="info-field">
+                        <label>Location Status Match:</label>
+                        <div class="value" id="location_status_match"></div>
+                    </div>
+                </div>
+                
+                <div class="validation-section">
+                    <h3>Validation</h3>
+                    <div class="validation-field">
+                        <label>POI Type Validation:</label>
+                        <select id="poi_type_validation">
+                            <option value="">Select...</option>
+                            <option value="correct">Correct</option>
+                            <option value="incorrect">Incorrect</option>
+                        </select>
+                    </div>
+                    <div class="validation-field">
+                        <label>Polygon Area Validation:</label>
+                        <select id="polygon_area_validation">
+                            <option value="">Select...</option>
+                            <option value="correct">Correct</option>
+                            <option value="incorrect">Incorrect</option>
+                        </select>
+                    </div>
+                    <div class="validation-field">
+                        <label>Polygon Validation:</label>
+                        <select id="polygon_validation">
+                            <option value="">Select...</option>
+                            <option value="correct">Correct</option>
+                            <option value="incorrect">Incorrect</option>
+                        </select>
+                    </div>
+                    <div class="comment-section">
+                        <label><strong>Comments:</strong></label>
+                        <textarea id="comments" placeholder="Enter your comments here..."></textarea>
+                    </div>
+                    <button class="btn btn-success save-button" onclick="saveValidation()">Save Validation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Enlarged view">
+        </div>
+    </div>
+    
+    <script>
+        let currentPOI = null;
+        let allPOIData = [];
+        let validationData = {};
+        
+        async function loadPOIList() {
+            try {
+                const response = await fetch('/api/poi_list');
+                const data = await response.json();
+                allPOIData = data.poi_list;
+                
+                // Load existing validation data first
+                const validResponse = await fetch('/api/get_validations');
+                validationData = await validResponse.json();
+                
+                const select = document.getElementById('poiSelect');
+                select.innerHTML = '<option value="">Select a POI...</option>';
+                
+                data.poi_list.forEach(poi => {
+                    const option = document.createElement('option');
+                    option.value = poi.poi_code;
+                    
+                    // Check if POI is validated
+                    const isValidated = validationData[poi.poi_code] && 
+                        (validationData[poi.poi_code].poi_type_validation || 
+                         validationData[poi.poi_code].polygon_area_validation || 
+                         validationData[poi.poi_code].polygon_validation);
+                    
+                    if (isValidated) {
+                        option.className = 'poi-validated';
+                        option.textContent = `✓ ${poi.poi_code} - ${poi.name}`;
+                    } else {
+                        option.className = 'poi-not-validated';
+                        option.textContent = `${poi.poi_code} - ${poi.name}`;
+                    }
+                    
+                    select.appendChild(option);
+                });
+                
+                // Update progress display
+                updateProgressDisplay();
+                
+            } catch (error) {
+                console.error('Error loading POI list:', error);
+                alert('Error loading POI list. Please check the server.');
+            }
+        }
+        
+        function updatePOIListDisplay() {
+            const select = document.getElementById('poiSelect');
+            const currentValue = select.value; // Remember current selection
+            
+            // Update each option
+            Array.from(select.options).forEach(option => {
+                if (option.value === '') return; // Skip the placeholder option
+                
+                const poiCode = option.value;
+                const poi = allPOIData.find(p => p.poi_code === poiCode);
+                if (!poi) return;
+                
+                // Check if POI is validated
+                const isValidated = validationData[poiCode] && 
+                    (validationData[poiCode].poi_type_validation || 
+                     validationData[poiCode].polygon_area_validation || 
+                     validationData[poiCode].polygon_validation);
+                
+                if (isValidated) {
+                    option.className = 'poi-validated';
+                    option.textContent = `✓ ${poiCode} - ${poi.name}`;
+                } else {
+                    option.className = 'poi-not-validated';
+                    option.textContent = `${poiCode} - ${poi.name}`;
+                }
+            });
+            
+            // Restore selection
+            select.value = currentValue;
+            
+            // Update progress display
+            updateProgressDisplay();
+        }
+        
+        function updateProgressDisplay() {
+            if (!allPOIData.length) return;
+            
+            const totalPOIs = allPOIData.length;
+            const validatedCount = Object.keys(validationData).filter(poiCode => {
+                const validation = validationData[poiCode];
+                return validation && (
+                    validation.poi_type_validation || 
+                    validation.polygon_area_validation || 
+                    validation.polygon_validation
+                );
+            }).length;
+            
+            const percentage = Math.round((validatedCount / totalPOIs) * 100);
+            const progressText = document.getElementById('progressText');
+            
+            progressText.innerHTML = `
+                <span style="color: #48bb78;">✓ ${validatedCount} validated</span> 
+                / ${totalPOIs} total POIs 
+                <span style="background: rgba(72, 187, 120, 0.2); padding: 2px 6px; border-radius: 3px;">${percentage}% complete</span>
+            `;
+        }
+        
+        async function loadPOI() {
+            const poiCode = document.getElementById('poiSelect').value;
+            if (!poiCode) {
+                alert('Please select a POI');
+                return;
+            }
+            
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('content').style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/poi_data/${poiCode}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                currentPOI = data;
+                displayPOIData(data);
+                
+                // Load existing validation if present
+                if (validationData[poiCode]) {
+                    const validation = validationData[poiCode];
+                    document.getElementById('poi_type_validation').value = validation.poi_type_validation || '';
+                    document.getElementById('polygon_area_validation').value = validation.polygon_area_validation || '';
+                    document.getElementById('polygon_validation').value = validation.polygon_validation || '';
+                    document.getElementById('comments').value = validation.comments || '';
+                }
+                
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('content').style.display = 'grid';
+            } catch (error) {
+                console.error('Error loading POI:', error);
+                alert('Error loading POI data');
+                document.getElementById('loading').classList.remove('active');
+            }
+        }
+        
+        function displayPOIData(data) {
+            // Generic Information
+            document.getElementById('poi_code').textContent = data.poi_code || 'N/A';
+            document.getElementById('name').textContent = data.name || 'N/A';
+            document.getElementById('address').textContent = data.address || 'N/A';
+            document.getElementById('district_code').textContent = data.district_code || 'N/A';
+            document.getElementById('country').textContent = data.country || 'N/A';
+            
+            const gmapsLink = document.getElementById('gmaps_url');
+            if (data.gmaps_url) {
+                gmapsLink.href = data.gmaps_url;
+                gmapsLink.style.display = 'inline';
+            } else {
+                gmapsLink.style.display = 'none';
+            }
+            
+            // Brand Information
+            document.getElementById('brands').textContent = data.brands || 'N/A';
+            document.getElementById('brand_method').textContent = data.brand_method || 'N/A';
+            
+            // POI Type Information
+            document.getElementById('poi_type').textContent = data.poi_type || 'N/A';
+            
+            // Handle category_poi_types list
+            const categoryTypes = document.getElementById('category_poi_types');
+            if (data.category_poi_types && Array.isArray(data.category_poi_types)) {
+                categoryTypes.innerHTML = data.category_poi_types.map(type => 
+                    `<span class="list-value">${type}</span>`
+                ).join('');
+            } else {
+                categoryTypes.textContent = 'N/A';
+            }
+            
+            document.getElementById('poi_type_cumulative').textContent = data.poi_type_cumulative || 'N/A';
+            document.getElementById('final_poitype_distilbert').textContent = data.final_poitype_distilbert || 'N/A';
+            
+            // Display confidence with color coding
+            const confidence = data.final_confidence_distilbert;
+            const confidenceEl = document.getElementById('final_confidence_distilbert');
+            if (confidence) {
+                const confValue = parseFloat(confidence);
+                let className = 'match-low';
+                if (confValue > 0.8) className = 'match-high';
+                else if (confValue > 0.5) className = 'match-medium';
+                confidenceEl.innerHTML = `<span class="match-status ${className}">${(confValue * 100).toFixed(2)}%</span>`;
+            } else {
+                confidenceEl.textContent = 'N/A';
+            }
+            
+            // Handle google_category_tags list
+            const googleTags = document.getElementById('google_category_tags');
+            if (data.google_category_tags && Array.isArray(data.google_category_tags)) {
+                googleTags.innerHTML = data.google_category_tags.map(tag => 
+                    `<span class="list-value">${tag}</span>`
+                ).join('');
+            } else {
+                googleTags.textContent = 'N/A';
+            }
+            
+            // Polygon Information
+            document.getElementById('area_tag').textContent = data.area_tag || 'N/A';
+            document.getElementById('polygon_area_sqm').textContent = data.polygon_area_sqm || 'N/A';
+            document.getElementById('parent_polygon_area_sqm').textContent = data.parent_polygon_area_sqm || 'N/A';
+            
+            // Matching Metrics
+            const nameMatch = data.name_match_pct;
+            const nameMatchEl = document.getElementById('name_match_pct');
+            if (nameMatch) {
+                const matchValue = parseFloat(nameMatch);
+                let className = 'match-low';
+                if (matchValue > 80) className = 'match-high';
+                else if (matchValue > 50) className = 'match-medium';
+                nameMatchEl.innerHTML = `<span class="match-status ${className}">${matchValue.toFixed(2)}%</span>`;
+            } else {
+                nameMatchEl.textContent = 'N/A';
+            }
+            
+            const addressMatch = data.address_match_pct;
+            const addressMatchEl = document.getElementById('address_match_pct');
+            if (addressMatch) {
+                const matchValue = parseFloat(addressMatch);
+                let className = 'match-low';
+                if (matchValue > 80) className = 'match-high';
+                else if (matchValue > 50) className = 'match-medium';
+                addressMatchEl.innerHTML = `<span class="match-status ${className}">${matchValue.toFixed(2)}%</span>`;
+            } else {
+                addressMatchEl.textContent = 'N/A';
+            }
+            
+            document.getElementById('distance_from_latlong_m').textContent = 
+                data.distance_from_latlong_m ? `${parseFloat(data.distance_from_latlong_m).toFixed(2)} m` : 'N/A';
+            
+            const locMatch = data.location_status_match;
+            const locMatchEl = document.getElementById('location_status_match');
+            if (locMatch !== undefined && locMatch !== null) {
+                const isMatch = String(locMatch).toLowerCase() === 'true';
+                locMatchEl.innerHTML = `<span class="match-status ${isMatch ? 'match-high' : 'match-low'}">${isMatch ? 'Match' : 'No Match'}</span>`;
+            } else {
+                locMatchEl.textContent = 'N/A';
+            }
+            
+            // Load screenshots
+            if (data.screenshot_display) {
+                document.getElementById('screenshotDisplay').src = `/api/screenshot/${encodeURIComponent(data.screenshot_display)}`;
+            }
+            if (data.screenshot_kepler) {
+                document.getElementById('screenshotKepler').src = `/api/screenshot/${encodeURIComponent(data.screenshot_kepler)}`;
+            }
+        }
+        
+        async function saveValidation() {
+            if (!currentPOI) {
+                alert('Please load a POI first');
+                return;
+            }
+            
+            const validation = {
+                poi_code: currentPOI.poi_code,
+                poi_type_validation: document.getElementById('poi_type_validation').value,
+                polygon_area_validation: document.getElementById('polygon_area_validation').value,
+                polygon_validation: document.getElementById('polygon_validation').value,
+                comments: document.getElementById('comments').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch('/api/save_validation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(validation)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    validationData[currentPOI.poi_code] = validation;
+                    alert('Validation saved successfully!');
+                    
+                    // Refresh the POI list to show the checkmark
+                    updatePOIListDisplay();
+                } else {
+                    alert('Error saving validation: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error saving validation:', error);
+                alert('Error saving validation');
+            }
+        }
+        
+        async function exportToExcel() {
+            try {
+                const response = await fetch('/api/export_excel');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `poi_validation_${new Date().toISOString().split('T')[0]}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error exporting to Excel:', error);
+                alert('Error exporting to Excel');
+            }
+        }
+        
+        async function exportToGoogleSheets() {
+            try {
+                const response = await fetch('/api/export_google_sheets_csv');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `poi_validation_google_sheets_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                alert('CSV exported! You can now import this file into Google Sheets.');
+            } catch (error) {
+                console.error('Error exporting to CSV:', error);
+                alert('Error exporting to CSV');
+            }
+        }
+        
+        function openModal(img) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('active');
+            modalImg.src = img.src;
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Close modal on click outside
+        document.getElementById('imageModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Initialize on page load
+        window.onload = loadPOIList;
+    </script>
+</body>
+</html>

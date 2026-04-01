@@ -1,0 +1,15 @@
+.env
+venv/
+node_modules/
+*.pyc
+__pycache__/
+.DS_Store
+.idea/
+**/venv
+**/input
+**/output
+**/output_old
+**/output_old2
+*.csv
+*.xlsx
+*.parquet

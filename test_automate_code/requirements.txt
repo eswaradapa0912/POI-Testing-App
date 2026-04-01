@@ -1,0 +1,12 @@
+colorama==0.4.6
+greenlet==3.3.2
+numpy==2.1.1
+packaging==26.0
+pandas==2.2.3
+playwright==1.58.0
+psutil==7.2.2
+pyee==13.0.1
+python-dateutil==2.9.0.post0
+six==1.17.0
+typing_extensions==4.15.0
+tzdata==2025.3
