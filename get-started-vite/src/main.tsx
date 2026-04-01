@@ -169,7 +169,7 @@ addDataToKep()
     <AutoSizer>
       {({height, width}) => (
         <KeplerGl
-          mapboxApiAccessToken="pk.eyJ1IjoiaWdvcjEzMTMxMyIsImEiOiJjbTRtMWxoMnIwN3VhMmlxOGRnZ3AxcGhhIn0.d9YD6z5nsBNzPXrXWzIaAA"
+          mapboxApiAccessToken="<MAPBOX_ACCESS_TOKEN>"
           id="map"
           width={width}
           height={height}
