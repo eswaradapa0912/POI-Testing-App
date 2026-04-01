@@ -22,7 +22,7 @@ CORS(app)
 
 # Configuration
 BASE_DIR = Path("/mnt/data/POI_Testing_Automation/version=5_0_2/test_automate_code/poi_validation_system")
-INPUT_CSV = BASE_DIR / "input" / "usa_sample_10.csv"
+INPUT_CSV = BASE_DIR / "input" / "usa_sample - usa_sample.csv"
 OUTPUT_CSV = BASE_DIR / "output" / "poi_extracted.csv"
 SCREENSHOTS_DISPLAY = BASE_DIR / "output" / "screenshots_with_display"
 SCREENSHOTS_KEPLER = BASE_DIR / "output" / "screenshots_kepler"
@@ -410,35 +410,6 @@ def update_google_sheets_csv():
     except Exception as e:
         print(f"Error updating Google Sheets CSV: {e}")
 
-@app.route('/api/export_excel')
-def export_excel():
-    """Export validation data to Excel"""
-    try:
-        # Update Excel file first
-        update_excel_report()
-        
-        if EXCEL_OUTPUT.exists():
-            return send_file(EXCEL_OUTPUT, as_attachment=True, 
-                           download_name=f"poi_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx")
-        else:
-            return jsonify({'error': 'Excel file not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/export_google_sheets_csv')
-def export_google_sheets_csv():
-    """Export Google Sheets compatible CSV"""
-    try:
-        # Update CSV file first
-        update_google_sheets_csv()
-        
-        if GOOGLE_SHEETS_CSV.exists():
-            return send_file(GOOGLE_SHEETS_CSV, as_attachment=True, 
-                           download_name=f"poi_validation_google_sheets_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
-        else:
-            return jsonify({'error': 'Google Sheets CSV file not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Ensure output directory exists

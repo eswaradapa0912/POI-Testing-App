@@ -400,9 +400,6 @@
                 </select>
             </div>
             <button class="btn btn-primary" onclick="loadPOI()">Load POI</button>
-            <button class="btn btn-success" onclick="saveValidation()">Save Validation</button>
-            <button class="btn btn-info" onclick="exportToExcel()">Export to Excel</button>
-            <button class="btn btn-info" onclick="exportToGoogleSheets()">Export to CSV (Google Sheets)</button>
         </div>
         
         <div class="loading" id="loading">
@@ -557,7 +554,7 @@
                         <label><strong>Comments:</strong></label>
                         <textarea id="comments" placeholder="Enter your comments here..."></textarea>
                     </div>
-                    <button class="btn btn-success save-button" onclick="saveValidation()">Save Validation</button>
+                    <div id="autoSaveStatus" style="margin-top: 10px; font-size: 13px; color: #718096; text-align: center;"></div>
                 </div>
             </div>
         </div>
@@ -825,12 +822,15 @@
             }
         }
         
-        async function saveValidation() {
-            if (!currentPOI) {
-                alert('Please load a POI first');
-                return;
-            }
-            
+        let autoSaveTimer = null;
+
+        async function autoSaveValidation() {
+            if (!currentPOI) return;
+
+            const statusEl = document.getElementById('autoSaveStatus');
+            statusEl.textContent = 'Saving...';
+            statusEl.style.color = '#667eea';
+
             const validation = {
                 poi_code: currentPOI.poi_code,
                 poi_type_validation: document.getElementById('poi_type_validation').value,
@@ -839,7 +839,7 @@
                 comments: document.getElementById('comments').value,
                 timestamp: new Date().toISOString()
             };
-            
+
             try {
                 const response = await fetch('/api/save_validation', {
                     method: 'POST',
@@ -848,58 +848,39 @@
                     },
                     body: JSON.stringify(validation)
                 });
-                
+
                 const result = await response.json();
                 if (result.success) {
                     validationData[currentPOI.poi_code] = validation;
-                    alert('Validation saved successfully!');
-                    
-                    // Refresh the POI list to show the checkmark
+                    statusEl.textContent = 'Saved automatically';
+                    statusEl.style.color = '#48bb78';
                     updatePOIListDisplay();
                 } else {
-                    alert('Error saving validation: ' + result.error);
+                    statusEl.textContent = 'Error saving';
+                    statusEl.style.color = '#e53e3e';
                 }
             } catch (error) {
-                console.error('Error saving validation:', error);
-                alert('Error saving validation');
+                console.error('Error auto-saving validation:', error);
+                statusEl.textContent = 'Error saving';
+                statusEl.style.color = '#e53e3e';
             }
         }
-        
-        async function exportToExcel() {
-            try {
-                const response = await fetch('/api/export_excel');
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `poi_validation_${new Date().toISOString().split('T')[0]}.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Error exporting to Excel:', error);
-                alert('Error exporting to Excel');
+
+        function triggerAutoSave(immediate) {
+            if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            if (immediate) {
+                autoSaveValidation();
+            } else {
+                // Debounce for text input (comments)
+                autoSaveTimer = setTimeout(autoSaveValidation, 800);
             }
         }
-        
-        async function exportToGoogleSheets() {
-            try {
-                const response = await fetch('/api/export_google_sheets_csv');
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `poi_validation_google_sheets_${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                alert('CSV exported! You can now import this file into Google Sheets.');
-            } catch (error) {
-                console.error('Error exporting to CSV:', error);
-                alert('Error exporting to CSV');
-            }
+
+        function setupAutoSaveListeners() {
+            document.getElementById('poi_type_validation').addEventListener('change', () => triggerAutoSave(true));
+            document.getElementById('polygon_area_validation').addEventListener('change', () => triggerAutoSave(true));
+            document.getElementById('polygon_validation').addEventListener('change', () => triggerAutoSave(true));
+            document.getElementById('comments').addEventListener('input', () => triggerAutoSave(false));
         }
         
         function openModal(img) {
@@ -929,7 +910,10 @@
         });
         
         // Initialize on page load
-        window.onload = loadPOIList;
+        window.onload = function() {
+            loadPOIList();
+            setupAutoSaveListeners();
+        };
     </script>
 </body>
 </html>
