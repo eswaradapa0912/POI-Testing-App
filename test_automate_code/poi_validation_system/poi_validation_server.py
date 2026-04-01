@@ -5,7 +5,7 @@ Provides API endpoints for POI data validation system
 Uses SQLite for data storage.
 """
 
-from flask import Flask, jsonify, request, send_file, send_from_directory
+from flask import Flask, jsonify, request, send_file, send_from_directory, Response
 from flask_cors import CORS
 import pandas as pd
 import json
@@ -13,6 +13,7 @@ import os
 import sqlite3
 import subprocess
 import ast
+import requests as http_requests
 from pathlib import Path
 from openpyxl.styles import PatternFill, Font, Alignment
 import trino
@@ -654,16 +655,68 @@ def open_kepler(poi_code):
                 'error': 'Could not start Kepler dev server. Please start it manually: cd get-started-vite && pnpm dev'
             }), 500
 
-        kepler_url = f"http://localhost:{KEPLER_PORT}"
         return jsonify({
             'success': True,
             'message': f'Kepler ready for {poi_code}',
-            'kepler_url': kepler_url
+            'kepler_url': '/kepler/'
         })
 
     except Exception as e:
         print(f"Error opening Kepler for {poi_code}: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+def _proxy_to_kepler(path=''):
+    """Proxy a request to the Kepler Vite dev server"""
+    target_url = f"http://localhost:{KEPLER_PORT}/{path}"
+    if request.query_string:
+        target_url += f"?{request.query_string.decode()}"
+
+    try:
+        resp = http_requests.request(
+            method=request.method,
+            url=target_url,
+            headers={k: v for k, v in request.headers if k.lower() != 'host'},
+            data=request.get_data(),
+            allow_redirects=False,
+            timeout=30
+        )
+
+        content = resp.content
+        content_type = resp.headers.get('Content-Type', '')
+
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+        headers = {k: v for k, v in resp.headers.items() if k.lower() not in excluded_headers}
+
+        return Response(content, status=resp.status_code, headers=headers, content_type=content_type)
+
+    except http_requests.ConnectionError:
+        return jsonify({'error': 'Kepler dev server is not running. Click "View Live Kepler" on a POI first.'}), 502
+    except Exception as e:
+        return jsonify({'error': f'Proxy error: {str(e)}'}), 500
+
+
+# Kepler proxy — main entry point
+@app.route('/kepler/')
+def proxy_kepler_root():
+    return _proxy_to_kepler('')
+
+# Proxy all Vite internal paths that Kepler needs
+@app.route('/@vite/<path:path>')
+def proxy_vite_client(path):
+    return _proxy_to_kepler(f'@vite/{path}')
+
+@app.route('/@react-refresh')
+def proxy_react_refresh():
+    return _proxy_to_kepler('@react-refresh')
+
+@app.route('/src/<path:path>')
+def proxy_src(path):
+    return _proxy_to_kepler(f'src/{path}')
+
+@app.route('/node_modules/<path:path>')
+def proxy_node_modules(path):
+    return _proxy_to_kepler(f'node_modules/{path}')
 
 
 if __name__ == '__main__':
