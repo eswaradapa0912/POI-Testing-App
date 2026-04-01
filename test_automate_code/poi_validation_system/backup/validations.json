@@ -136,8 +136,8 @@
     "brand_validation": "",
     "polygon_area_validation": "incorrect",
     "polygon_validation": "incorrect",
-    "comments": "",
-    "timestamp": "2026-04-01T11:31:52.784Z"
+    "comments": "the issue is here they sell pumki",
+    "timestamp": "2026-04-01T11:27:39.283Z"
   },
   "POI_USA_9999_0x2556c86cb9635137:0x92466291c65dfad9": {
     "poi_code": "POI_USA_9999_0x2556c86cb9635137:0x92466291c65dfad9",
@@ -148,15 +148,5 @@
     "polygon_validation": "correct",
     "comments": "",
     "timestamp": "2026-04-01T11:29:19.642Z"
-  },
-  "POI_USA_9999_0x439a63754590f8dd:0x1dbf40171c252d40": {
-    "poi_code": "POI_USA_9999_0x439a63754590f8dd:0x1dbf40171c252d40",
-    "poi_type_validation": "incorrect",
-    "correct_poi_type": "shop.habit.alcohol",
-    "brand_validation": "correct",
-    "polygon_area_validation": "",
-    "polygon_validation": "",
-    "comments": "",
-    "timestamp": "2026-04-01T11:33:21.131Z"
   }
 }
