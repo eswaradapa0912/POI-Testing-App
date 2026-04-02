@@ -123,6 +123,21 @@ def get_config():
     return jsonify(load_config())
 
 
+@app.route('/api/poi_type_descriptions')
+def get_poi_type_descriptions():
+    """Get all POI type descriptions from CSV"""
+    csv_path = BASE_DIR / "poi_type_dexcription.csv"
+    if not csv_path.exists():
+        return jsonify({'descriptions': {}})
+    try:
+        df = pd.read_csv(csv_path)
+        descriptions = dict(zip(df['poi_type'].astype(str), df['description'].astype(str)))
+        return jsonify({'descriptions': descriptions})
+    except Exception as e:
+        print(f"Error reading poi_type descriptions: {e}")
+        return jsonify({'descriptions': {}})
+
+
 @app.route('/api/filters')
 def get_filters():
     """Get unique values for filter dropdowns"""
@@ -563,6 +578,58 @@ def get_analytics():
             'per_assignee': per_assignee,
             'assignees': assignees
         })
+    finally:
+        conn.close()
+
+
+@app.route('/api/filtered_pois')
+def get_filtered_pois():
+    """Get POIs filtered by a specific validation field and value"""
+    field = request.args.get('field', '')
+    value = request.args.get('value', '')
+    assignee = request.args.get('assignee', '')
+
+    valid_fields = {
+        'poi_type_validation': 'poi_type_validation',
+        'brand_validation': 'brand_validation',
+        'polygon_area_validation': 'polygon_area_validation',
+        'polygon_validation': 'polygon_validation'
+    }
+
+    if field not in valid_fields:
+        return jsonify({'error': f'Invalid field: {field}'}), 400
+
+    conn = get_db()
+    try:
+        # Get all POIs with names
+        all_pois = conn.execute("SELECT poi_code, name FROM poi_input ORDER BY poi_code").fetchall()
+        poi_list = [{'poi_code': r['poi_code'], 'name': r['name'] or 'Unknown'} for r in all_pois]
+
+        # Apply assignee filter
+        if assignee:
+            config = load_config()
+            assignees = config.get('assignees', [])
+            if assignees and assignee in assignees:
+                idx = assignees.index(assignee)
+                n = len(assignees)
+                poi_list = [p for i, p in enumerate(poi_list) if i % n == idx]
+
+        # Get validations
+        val_rows = conn.execute("SELECT * FROM validations").fetchall()
+        validations = {r['poi_code']: dict(r) for r in val_rows}
+
+        # Filter by validation field + value
+        filtered = []
+        for p in poi_list:
+            v = validations.get(p['poi_code'], {})
+            val = v.get(field, '')
+            if value == 'untested':
+                if not val:
+                    filtered.append(p)
+            elif val == value:
+                filtered.append(p)
+
+        return jsonify({'poi_list': filtered})
     finally:
         conn.close()
 

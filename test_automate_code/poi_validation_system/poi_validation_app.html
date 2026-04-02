@@ -776,6 +776,18 @@
             display: inline-block;
         }
 
+        .legend-link {
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .legend-link:hover {
+            background: rgba(102, 126, 234, 0.15);
+            text-decoration: underline;
+        }
+
         .comments-section {
             background: #f8f9fa;
             border-radius: 16px;
@@ -1013,6 +1025,7 @@
                     <div class="info-field">
                         <label>POI Type:</label>
                         <div class="value" id="poi_type"></div>
+                        <div id="poi_type_description" style="font-size: 0.85em; color: #718096; margin-top: 4px; font-style: italic;"></div>
                     </div>
                     <div class="info-field">
                         <label>Category POI Types:</label>
@@ -1088,8 +1101,13 @@
                     </div>
                     <div class="validation-field" id="correct_poi_type_field" style="display: none;">
                         <label>Correct POI Type <span style="font-size: 0.8em; color: #a0aec0;">(optional)</span>:</label>
-                        <input type="text" id="correct_poi_type" placeholder="e.g. shop.food.grocery" style="width: 100%; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
-                        <a href="https://docs.google.com/spreadsheets/d/1-VqNQyuaRpHEEYtymN6xOMa976wntIHm6Fv6MFXLxW4/edit?gid=1337350158#gid=1337350158" target="_blank" style="font-size: 0.8em; color: #667eea; margin-top: 4px; display: inline-block;">View POI Types Reference Sheet</a>
+                        <div style="position: relative;">
+                            <input type="text" id="correct_poi_type_search" placeholder="Search POI types..." autocomplete="off"
+                                style="width: 100%; padding: 8px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;">
+                            <input type="hidden" id="correct_poi_type">
+                            <div id="correct_poi_type_dropdown" style="display:none; position:absolute; z-index:1000; width:100%; max-height:250px; overflow-y:auto; background:white; border:2px solid #667eea; border-top:none; border-radius:0 0 8px 8px; box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div>
+                        </div>
+                        <div id="correct_poi_type_desc" style="font-size: 0.85em; color: #718096; margin-top: 6px; font-style: italic;"></div>
                     </div>
                     <div class="validation-field">
                         <label>Brand Validation:</label>
@@ -1190,18 +1208,21 @@
         let validationData = {};
         let filterData = {};
         let configData = {};
+        let poiTypeDescriptions = {};
 
         async function initApp() {
             try {
                 // Load config, filters, and validations in parallel
-                const [configRes, filterRes, validRes] = await Promise.all([
+                const [configRes, filterRes, validRes, descRes] = await Promise.all([
                     fetch('/api/config'),
                     fetch('/api/filters'),
-                    fetch('/api/get_validations')
+                    fetch('/api/get_validations'),
+                    fetch('/api/poi_type_descriptions')
                 ]);
                 configData = await configRes.json();
                 filterData = await filterRes.json();
                 validationData = await validRes.json();
+                poiTypeDescriptions = (await descRes.json()).descriptions || {};
 
                 // Populate filter dropdowns
                 populateSelect('filterCountry', filterData.countries, 'All Countries');
@@ -1380,6 +1401,9 @@
                 // Reset validation fields, then load existing if present
                 document.getElementById('poi_type_validation').value = '';
                 document.getElementById('correct_poi_type').value = '';
+                document.getElementById('correct_poi_type_search').value = '';
+                document.getElementById('correct_poi_type_desc').textContent = '';
+                document.getElementById('correct_poi_type_dropdown').style.display = 'none';
                 document.getElementById('correct_poi_type_field').style.display = 'none';
                 document.getElementById('brand_validation').value = '';
                 document.getElementById('polygon_area_validation').value = '';
@@ -1391,6 +1415,8 @@
                     const validation = validationData[poiCode];
                     document.getElementById('poi_type_validation').value = validation.poi_type_validation || '';
                     document.getElementById('correct_poi_type').value = validation.correct_poi_type || '';
+                    document.getElementById('correct_poi_type_search').value = validation.correct_poi_type || '';
+                    document.getElementById('correct_poi_type_desc').textContent = poiTypeDescriptions[validation.correct_poi_type] || '';
                     document.getElementById('brand_validation').value = validation.brand_validation || '';
                     document.getElementById('polygon_area_validation').value = validation.polygon_area_validation || '';
                     document.getElementById('polygon_validation').value = validation.polygon_validation || '';
@@ -1435,6 +1461,8 @@
             
             // POI Type Information
             document.getElementById('poi_type').textContent = data.poi_type || 'N/A';
+            const poiTypeDesc = poiTypeDescriptions[data.poi_type] || '';
+            document.getElementById('poi_type_description').textContent = poiTypeDesc;
             
             // Handle category_poi_types list
             const categoryTypes = document.getElementById('category_poi_types');
@@ -1605,18 +1633,81 @@
             } else {
                 field.style.display = 'none';
                 document.getElementById('correct_poi_type').value = '';
+                document.getElementById('correct_poi_type_search').value = '';
+                document.getElementById('correct_poi_type_desc').textContent = '';
+                document.getElementById('correct_poi_type_dropdown').style.display = 'none';
             }
         }
 
         function setupAutoSaveListeners() {
             document.getElementById('poi_type_validation').addEventListener('change', () => triggerAutoSave(true));
-            document.getElementById('correct_poi_type').addEventListener('input', () => triggerAutoSave(false));
             document.getElementById('brand_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('polygon_area_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('polygon_validation').addEventListener('change', () => triggerAutoSave(true));
             document.getElementById('comments').addEventListener('input', () => triggerAutoSave(false));
+            setupPoiTypeSearch();
         }
         
+        function setupPoiTypeSearch() {
+            const searchInput = document.getElementById('correct_poi_type_search');
+            const hiddenInput = document.getElementById('correct_poi_type');
+            const dropdown = document.getElementById('correct_poi_type_dropdown');
+            const descDiv = document.getElementById('correct_poi_type_desc');
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                hiddenInput.value = '';
+                descDiv.textContent = '';
+
+                if (!query) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+
+                const matches = Object.entries(poiTypeDescriptions)
+                    .filter(([type, desc]) => type.toLowerCase().includes(query) || desc.toLowerCase().includes(query))
+                    .slice(0, 30);
+
+                if (matches.length === 0) {
+                    dropdown.innerHTML = '<div style="padding:10px;color:#a0aec0;font-size:13px;">No matching POI types found</div>';
+                    dropdown.style.display = 'block';
+                    return;
+                }
+
+                dropdown.innerHTML = matches.map(([type, desc]) => `
+                    <div class="poi-type-option" data-type="${type}" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #edf2f7;transition:background 0.15s;"
+                         onmouseover="this.style.background='#ebf4ff'" onmouseout="this.style.background='white'">
+                        <div style="font-weight:600;font-size:13px;color:#2d3748;">${type}</div>
+                        <div style="font-size:12px;color:#718096;margin-top:2px;">${desc}</div>
+                    </div>
+                `).join('');
+                dropdown.style.display = 'block';
+
+                dropdown.querySelectorAll('.poi-type-option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        const selectedType = this.dataset.type;
+                        searchInput.value = selectedType;
+                        hiddenInput.value = selectedType;
+                        descDiv.textContent = poiTypeDescriptions[selectedType] || '';
+                        dropdown.style.display = 'none';
+                        triggerAutoSave(true);
+                    });
+                });
+            });
+
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim()) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#correct_poi_type_field')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+
         async function openKeplerForCurrentPOI() {
             if (!currentPOI || !currentPOI.poi_code) {
                 alert('No POI selected');
@@ -1748,10 +1839,10 @@
             `;
 
             // Draw donut charts
-            drawDonut('chartPoiType', 'legendPoiType', stats.poi_type);
-            drawDonut('chartBrand', 'legendBrand', stats.brand);
-            drawDonut('chartPolygonArea', 'legendPolygonArea', stats.polygon_area);
-            drawDonut('chartPolygon', 'legendPolygon', stats.polygon);
+            drawDonut('chartPoiType', 'legendPoiType', stats.poi_type, 'poi_type_validation');
+            drawDonut('chartBrand', 'legendBrand', stats.brand, 'brand_validation');
+            drawDonut('chartPolygonArea', 'legendPolygonArea', stats.polygon_area, 'polygon_area_validation');
+            drawDonut('chartPolygon', 'legendPolygon', stats.polygon, 'polygon_validation');
 
             // Comments
             const commentsEl = document.getElementById('commentsList');
@@ -1777,7 +1868,7 @@
             return div.innerHTML;
         }
 
-        function drawDonut(canvasId, legendId, data) {
+        function drawDonut(canvasId, legendId, data, fieldName) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
             const w = canvas.width, h = canvas.height;
@@ -1788,15 +1879,14 @@
             ctx.clearRect(0, 0, w, h);
 
             const segments = [
-                { label: 'Correct', value: data.correct, color: '#48bb78' },
-                { label: 'Incorrect', value: data.incorrect, color: '#fc8181' },
-                { label: 'Untested', value: data.untested, color: '#e2e8f0' }
+                { label: 'Correct', value: data.correct, color: '#48bb78', filterVal: 'correct' },
+                { label: 'Incorrect', value: data.incorrect, color: '#fc8181', filterVal: 'incorrect' },
+                { label: 'Untested', value: data.untested, color: '#e2e8f0', filterVal: 'untested' }
             ];
 
             const total = segments.reduce((s, seg) => s + seg.value, 0);
 
             if (total === 0) {
-                // Draw empty ring
                 ctx.beginPath();
                 ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
                 ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
@@ -1828,10 +1918,39 @@
             ctx.fillStyle = '#718096';
             ctx.fillText('correct', cx, cy + 14);
 
-            // Legend
+            // Clickable legend
             document.getElementById(legendId).innerHTML = segments.map(seg =>
-                `<span><span class="legend-dot" style="background:${seg.color}"></span>${seg.label}: ${seg.value}</span>`
+                seg.value > 0
+                    ? `<span class="legend-link" onclick="viewFilteredPOIs('${fieldName}', '${seg.filterVal}')" title="View these POIs"><span class="legend-dot" style="background:${seg.color}"></span>${seg.label}: ${seg.value}</span>`
+                    : `<span><span class="legend-dot" style="background:${seg.color}"></span>${seg.label}: ${seg.value}</span>`
             ).join('');
+        }
+
+        async function viewFilteredPOIs(field, value) {
+            const assignee = document.getElementById('analyticsAssigneeFilter').value;
+            const params = new URLSearchParams({ field, value });
+            if (assignee) params.set('assignee', assignee);
+
+            try {
+                const response = await fetch(`/api/filtered_pois?${params.toString()}`);
+                const data = await response.json();
+
+                if (!data.poi_list || data.poi_list.length === 0) {
+                    alert('No POIs found for this filter.');
+                    return;
+                }
+
+                // Load these POIs into the validation view
+                allPOIData = data.poi_list;
+                currentIndex = 0;
+                showValidationView();
+                await loadPOIByIndex(0);
+                updateNavButtons();
+                updateProgressDisplay();
+            } catch (err) {
+                console.error('Error loading filtered POIs:', err);
+                alert('Error loading filtered POIs');
+            }
         }
 
         function enterApp() {
