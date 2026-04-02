@@ -57,29 +57,122 @@
             color: #22543d !important;
             font-weight: 600;
         }
-        
+
         .poi-not-validated {
             background-color: #ffffff !important;
             color: #2d3748 !important;
         }
-        
-        .validation-status {
+
+        .validation-status-badge {
             display: inline-block;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.75em;
-            font-weight: bold;
-            margin-left: 8px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px;
+            vertical-align: middle;
         }
-        
-        .status-validated {
-            background-color: #48bb78;
+        .validation-status-badge.validated {
+            background: #c6efce;
+            color: #22543d;
+        }
+        .validation-status-badge.not-validated {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 0;
+        }
+
+        .poi-sidebar {
+            width: 260px;
+            min-width: 260px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #e2e8f0;
+            padding: 0;
+        }
+        .poi-sidebar-header {
+            padding: 12px 14px;
+            font-weight: 700;
+            font-size: 13px;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            background: #edf2f7;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .poi-sidebar-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+        .poi-sidebar-item:hover {
+            background: #ebf4ff;
+        }
+        .poi-sidebar-item.active {
+            background: #667eea;
             color: white;
         }
-        
-        .status-not-validated {
-            background-color: #cbd5e0;
-            color: #4a5568;
+        .poi-sidebar-item.active .poi-sidebar-dot {
+            border-color: white;
+        }
+        .poi-sidebar-dot {
+            width: 10px;
+            height: 10px;
+            min-width: 10px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+        }
+        .poi-sidebar-dot.validated {
+            background: #48bb78;
+        }
+        .poi-sidebar-dot.not-validated {
+            background: #e2e8f0;
+            border-color: #cbd5e0;
+        }
+        .poi-sidebar-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+        .poi-sidebar-check {
+            font-size: 11px;
+            color: #48bb78;
+            font-weight: 700;
+        }
+        .poi-sidebar-item.active .poi-sidebar-check {
+            color: #c6f6d5;
+        }
+
+        .content-main {
+            flex: 1;
+            min-width: 0;
         }
         
         .btn {
@@ -261,6 +354,45 @@
             border: 2px solid #f39c12;
             border-radius: 6px;
             font-size: 14px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex: 1;
+            justify-content: center;
+            user-select: none;
+        }
+        .radio-group label:hover {
+            border-color: #f39c12;
+        }
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+        .radio-group input[type="radio"]:checked + span {
+            font-weight: 700;
+        }
+        .radio-group label.selected-correct {
+            background: #c6efce;
+            border-color: #48bb78;
+            color: #22543d;
+        }
+        .radio-group label.selected-incorrect {
+            background: #fed7d7;
+            border-color: #fc8181;
+            color: #9b2c2c;
         }
         
         .comment-section {
@@ -797,6 +929,120 @@
             text-decoration: underline;
         }
 
+        .tester-analytics {
+            margin-top: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .tester-analytics h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        .tester-table-wrap {
+            overflow-x: auto;
+        }
+        .tester-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .tester-table th {
+            background: #4472C4;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .tester-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tester-table tr:hover {
+            background: #f7fafc;
+        }
+        .tester-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+        .tester-table .correct-val { color: #22543d; font-weight: 600; }
+        .tester-table .incorrect-val { color: #9b2c2c; font-weight: 600; }
+        .tester-table .time-val { font-size: 12px; color: #4a5568; white-space: nowrap; }
+
+        .summary-body {
+            padding: 30px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 1024px) {
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .summary-card h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .summary-table th {
+            background: #4472C4;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .summary-table th:nth-child(2),
+        .summary-table th:nth-child(3),
+        .summary-table th:nth-child(4) {
+            text-align: center;
+        }
+        .summary-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .summary-table td:nth-child(2),
+        .summary-table td:nth-child(3),
+        .summary-table td:nth-child(4) {
+            text-align: center;
+        }
+        .summary-table tr:hover {
+            background: #f7fafc;
+        }
+        .summary-table .rank-col {
+            color: #718096;
+            font-weight: 600;
+            width: 35px;
+        }
+        .summary-table .incorrect-bar {
+            display: inline-block;
+            height: 8px;
+            background: #fc8181;
+            border-radius: 4px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
         .comments-section {
             background: #f8f9fa;
             border-radius: 16px;
@@ -882,6 +1128,12 @@
                     </span>
                     Analytics
                 </button>
+                <button class="home-action-btn" onclick="enterSummary()">
+                    <span class="action-icon purple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </span>
+                    Summary
+                </button>
             </div>
         </div>
         <div class="home-quotes-bar">
@@ -913,11 +1165,15 @@
                 <p style="font-size: 0.9em; opacity: 0.9;">The Authority that Confirms</p>
                 <div id="validationProgress" style="margin-top: 10px; font-size: 13px; opacity: 0.9;">
                     <span id="progressText">Loading POI data...</span>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+                    </div>
                 </div>
             </div>
             <div class="header-nav">
                 <button class="header-nav-btn active" id="navValidation" onclick="showValidationView()">Validation</button>
                 <button class="header-nav-btn" id="navAnalytics" onclick="showAnalyticsView()">Analytics</button>
+                <button class="header-nav-btn" id="navSummary" onclick="showSummaryView()">Summary</button>
             </div>
         </div>
 
@@ -953,6 +1209,7 @@
             <div style="display: flex; gap: 12px; width: 100%; align-items: center; margin-top: 10px; justify-content: center;">
                 <button class="btn btn-primary" id="btnPrev" onclick="prevPOI()" style="height: 40px; min-width: 100px;" disabled>Previous</button>
                 <span id="poiCounter" style="font-size: 14px; font-weight: 600; color: #4a5568; min-width: 120px; text-align: center;">0 / 0</span>
+                <span id="currentPoiStatus" class="validation-status-badge not-validated" style="display:none;"></span>
                 <button class="btn btn-primary" id="btnNext" onclick="nextPOI()" style="height: 40px; min-width: 100px;" disabled>Next</button>
             </div>
         </div>
@@ -961,7 +1218,13 @@
             <div class="spinner"></div>
             <p style="margin-top: 20px; color: #667eea; font-weight: 600;">Loading POI data...</p>
         </div>
-        
+
+        <div class="content-wrapper">
+        <div class="poi-sidebar" id="poiSidebar">
+            <div class="poi-sidebar-header">POI List <span id="sidebarCount" style="float:right; font-weight:400; color:#718096;"></span></div>
+            <div id="poiSidebarList"></div>
+        </div>
+        <div class="content-main">
         <div class="content" id="content" style="display: none;">
             <div class="info-section">
                 <div class="section-card">
@@ -1114,11 +1377,14 @@
                     <h3>Validation</h3>
                     <div class="validation-field">
                         <label>POI Type Validation:</label>
-                        <select id="poi_type_validation" onchange="onPoiTypeValidationChange()">
-                            <option value="">Select...</option>
-                            <option value="correct">Correct</option>
-                            <option value="incorrect">Incorrect</option>
-                        </select>
+                        <div class="radio-group" id="poi_type_validation">
+                            <label>
+                                <input type="radio" name="poi_type_validation" value="correct" onchange="highlightRadio(this); onPoiTypeValidationChange();"><span>Correct</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="poi_type_validation" value="incorrect" onchange="highlightRadio(this); onPoiTypeValidationChange();"><span>Incorrect</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="validation-field" id="correct_poi_type_field" style="display: none;">
                         <label>Correct POI Type <span style="font-size: 0.8em; color: #a0aec0;">(optional)</span>:</label>
@@ -1132,36 +1398,51 @@
                     </div>
                     <div class="validation-field">
                         <label>Brand Validation:</label>
-                        <select id="brand_validation">
-                            <option value="">Select...</option>
-                            <option value="correct">Correct</option>
-                            <option value="incorrect">Incorrect</option>
-                        </select>
+                        <div class="radio-group" id="brand_validation">
+                            <label>
+                                <input type="radio" name="brand_validation" value="correct" onchange="highlightRadio(this)"><span>Correct</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="brand_validation" value="incorrect" onchange="highlightRadio(this)"><span>Incorrect</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="validation-field">
                         <label>Polygon Area Validation:</label>
-                        <select id="polygon_area_validation">
-                            <option value="">Select...</option>
-                            <option value="correct">Correct</option>
-                            <option value="incorrect">Incorrect</option>
-                        </select>
+                        <div class="radio-group" id="polygon_area_validation">
+                            <label>
+                                <input type="radio" name="polygon_area_validation" value="correct" onchange="highlightRadio(this)"><span>Correct</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="polygon_area_validation" value="incorrect" onchange="highlightRadio(this)"><span>Incorrect</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="validation-field">
                         <label>Polygon Validation:</label>
-                        <select id="polygon_validation">
-                            <option value="">Select...</option>
-                            <option value="correct">Correct</option>
-                            <option value="incorrect">Incorrect</option>
-                        </select>
+                        <div class="radio-group" id="polygon_validation">
+                            <label>
+                                <input type="radio" name="polygon_validation" value="correct" onchange="highlightRadio(this)"><span>Correct</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="polygon_validation" value="incorrect" onchange="highlightRadio(this)"><span>Incorrect</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="comment-section">
                         <label><strong>Comments:</strong></label>
                         <textarea id="comments" placeholder="Enter your comments here..."></textarea>
                     </div>
-                    <div id="autoSaveStatus" style="margin-top: 10px; font-size: 13px; color: #718096; text-align: center;"></div>
+                    <button class="btn btn-success" id="btnSubmitValidation" onclick="submitValidation()" style="margin-top: 15px; width: 100%; padding: 12px; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Submit Validation
+                    </button>
+                    <div id="submitStatus" style="margin-top: 10px; font-size: 13px; color: #718096; text-align: center;"></div>
                 </div>
             </div>
         </div>
+        </div><!-- end content-main -->
+        </div><!-- end content-wrapper -->
 
         <div id="bottomNav" style="display: none; padding: 16px 30px; background: #f8f9fa; border-top: 1px solid #dee2e6; justify-content: center; align-items: center; gap: 20px;">
             <button class="btn btn-primary" id="btnPrevBottom" onclick="prevPOI()" style="height: 40px; min-width: 100px;" disabled>Previous</button>
@@ -1212,12 +1493,43 @@
                 </div>
             </div>
 
+            <div class="tester-analytics">
+                <h3>Tester Analytics</h3>
+                <div class="tester-table-wrap">
+                    <div id="testerTableContainer"></div>
+                </div>
+            </div>
+
             <div class="comments-section">
                 <h3>Comments & Issues</h3>
                 <div class="comments-list" id="commentsList"></div>
             </div>
         </div>
     </div><!-- end analyticsView -->
+
+    <!-- Summary View -->
+    <div id="summaryView" style="display: none;">
+        <div class="summary-body">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Most Incorrect — POI Type Validation</h3>
+                    <div id="summaryPoiType"></div>
+                </div>
+                <div class="summary-card">
+                    <h3>Most Incorrect — Brand Validation</h3>
+                    <div id="summaryBrand"></div>
+                </div>
+                <div class="summary-card">
+                    <h3>Most Incorrect — Polygon Area Validation</h3>
+                    <div id="summaryPolygonArea"></div>
+                </div>
+                <div class="summary-card">
+                    <h3>Most Incorrect — Polygon Validation</h3>
+                    <div id="summaryPolygon"></div>
+                </div>
+            </div>
+        </div>
+    </div><!-- end summaryView -->
 
     </div><!-- end container -->
     </div><!-- end app-screen -->
@@ -1354,48 +1666,92 @@
         }
 
         async function prevPOI() {
-            if (currentIndex > 0) {
-                currentIndex--;
+            let idx = currentIndex - 1;
+            while (idx >= 0 && isPoiValidated(allPOIData[idx].poi_code)) {
+                idx--;
+            }
+            if (idx >= 0) {
+                currentIndex = idx;
                 await loadPOIByIndex(currentIndex);
                 updateNavButtons();
+                renderPoiSidebar();
             }
         }
 
         async function nextPOI() {
-            if (currentIndex < allPOIData.length - 1) {
-                currentIndex++;
+            let idx = currentIndex + 1;
+            while (idx < allPOIData.length && isPoiValidated(allPOIData[idx].poi_code)) {
+                idx++;
+            }
+            if (idx < allPOIData.length) {
+                currentIndex = idx;
                 await loadPOIByIndex(currentIndex);
                 updateNavButtons();
+                renderPoiSidebar();
             }
         }
         
+        function isPoiValidated(poiCode) {
+            const v = validationData[poiCode];
+            return v && (v.poi_type_validation || v.brand_validation || v.polygon_area_validation || v.polygon_validation);
+        }
+
         function updateProgressDisplay() {
             if (!allPOIData.length) {
                 document.getElementById('progressText').textContent = 'No POIs match the current filters';
+                document.getElementById('progressBarFill').style.width = '0%';
                 return;
             }
 
             const totalPOIs = allPOIData.length;
-            const filteredCodes = new Set(allPOIData.map(p => p.poi_code));
-            const validatedCount = Object.keys(validationData).filter(poiCode => {
-                if (!filteredCodes.has(poiCode)) return false;
-                const validation = validationData[poiCode];
-                return validation && (
-                    validation.poi_type_validation ||
-                    validation.brand_validation ||
-                    validation.polygon_area_validation ||
-                    validation.polygon_validation
-                );
-            }).length;
-
+            const validatedCount = allPOIData.filter(p => isPoiValidated(p.poi_code)).length;
             const percentage = Math.round((validatedCount / totalPOIs) * 100);
-            const progressText = document.getElementById('progressText');
 
-            progressText.innerHTML = `
+            document.getElementById('progressText').innerHTML = `
                 <span style="color: #48bb78;">\u2713 ${validatedCount} validated</span>
                 / ${totalPOIs} total POIs
                 <span style="background: rgba(72, 187, 120, 0.2); padding: 2px 6px; border-radius: 3px;">${percentage}% complete</span>
             `;
+            document.getElementById('progressBarFill').style.width = `${percentage}%`;
+
+            // Update sidebar
+            renderPoiSidebar();
+
+            // Update current POI status badge
+            updateCurrentPoiStatusBadge();
+        }
+
+        function updateCurrentPoiStatusBadge() {
+            const badge = document.getElementById('currentPoiStatus');
+            if (currentIndex < 0 || currentIndex >= allPOIData.length) {
+                badge.style.display = 'none';
+                return;
+            }
+            const poiCode = allPOIData[currentIndex].poi_code;
+            const validated = isPoiValidated(poiCode);
+            badge.style.display = 'inline-block';
+            badge.textContent = validated ? 'Validated' : 'Not Validated';
+            badge.className = 'validation-status-badge ' + (validated ? 'validated' : 'not-validated');
+        }
+
+        function renderPoiSidebar() {
+            const list = document.getElementById('poiSidebarList');
+            const validatedCount = allPOIData.filter(p => isPoiValidated(p.poi_code)).length;
+            document.getElementById('sidebarCount').textContent = `${validatedCount}/${allPOIData.length}`;
+
+            list.innerHTML = allPOIData.map((p, i) => {
+                const validated = isPoiValidated(p.poi_code);
+                const isActive = i === currentIndex;
+                return `<div class="poi-sidebar-item${isActive ? ' active' : ''}" data-index="${i}" onclick="loadPOIByIndex(${i}); currentIndex=${i}; updateNavButtons(); renderPoiSidebar();">
+                    <span class="poi-sidebar-dot ${validated ? 'validated' : 'not-validated'}"></span>
+                    <span class="poi-sidebar-name" title="${p.name || 'Unknown'}">${p.name || 'Unknown'}</span>
+                    ${validated ? '<span class="poi-sidebar-check">\u2713</span>' : ''}
+                </div>`;
+            }).join('');
+
+            // Scroll active item into view
+            const activeEl = list.querySelector('.poi-sidebar-item.active');
+            if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
         }
         
         async function loadPOIByIndex(index) {
@@ -1420,33 +1776,35 @@
                 displayPOIData(data);
 
                 // Reset validation fields, then load existing if present
-                document.getElementById('poi_type_validation').value = '';
+                setRadioValue('poi_type_validation', '');
                 document.getElementById('correct_poi_type').value = '';
                 document.getElementById('correct_poi_type_search').value = '';
                 document.getElementById('correct_poi_type_desc').textContent = '';
                 document.getElementById('correct_poi_type_dropdown').style.display = 'none';
                 document.getElementById('correct_poi_type_field').style.display = 'none';
-                document.getElementById('brand_validation').value = '';
-                document.getElementById('polygon_area_validation').value = '';
-                document.getElementById('polygon_validation').value = '';
+                setRadioValue('brand_validation', '');
+                setRadioValue('polygon_area_validation', '');
+                setRadioValue('polygon_validation', '');
                 document.getElementById('comments').value = '';
-                document.getElementById('autoSaveStatus').textContent = '';
+                document.getElementById('submitStatus').textContent = '';
 
                 if (validationData[poiCode]) {
                     const validation = validationData[poiCode];
-                    document.getElementById('poi_type_validation').value = validation.poi_type_validation || '';
+                    setRadioValue('poi_type_validation', validation.poi_type_validation || '');
                     document.getElementById('correct_poi_type').value = validation.correct_poi_type || '';
                     document.getElementById('correct_poi_type_search').value = validation.correct_poi_type || '';
                     document.getElementById('correct_poi_type_desc').textContent = poiTypeDescriptions[validation.correct_poi_type] || '';
-                    document.getElementById('brand_validation').value = validation.brand_validation || '';
-                    document.getElementById('polygon_area_validation').value = validation.polygon_area_validation || '';
-                    document.getElementById('polygon_validation').value = validation.polygon_validation || '';
+                    setRadioValue('brand_validation', validation.brand_validation || '');
+                    setRadioValue('polygon_area_validation', validation.polygon_area_validation || '');
+                    setRadioValue('polygon_validation', validation.polygon_validation || '');
                     document.getElementById('comments').value = validation.comments || '';
                     onPoiTypeValidationChange();
                 }
 
                 document.getElementById('loading').classList.remove('active');
                 document.getElementById('content').style.display = 'grid';
+                updateCurrentPoiStatusBadge();
+                renderPoiSidebar();
             } catch (error) {
                 console.error('Error loading POI:', error);
                 alert('Error loading POI data');
@@ -1589,25 +1947,28 @@
             }
         }
         
-        let autoSaveTimer = null;
-
-        async function autoSaveValidation() {
+        async function submitValidation() {
             if (!currentPOI) return;
 
-            const statusEl = document.getElementById('autoSaveStatus');
+            const btn = document.getElementById('btnSubmitValidation');
+            const statusEl = document.getElementById('submitStatus');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
             statusEl.textContent = 'Saving...';
             statusEl.style.color = '#667eea';
 
-            const poiTypeVal = document.getElementById('poi_type_validation').value;
+            const poiTypeVal = getRadioValue('poi_type_validation');
+            const validatorName = document.getElementById('filterAssignee').value;
             const validation = {
                 poi_code: currentPOI.poi_code,
                 poi_type_validation: poiTypeVal,
                 correct_poi_type: poiTypeVal === 'incorrect' ? document.getElementById('correct_poi_type').value : '',
-                brand_validation: document.getElementById('brand_validation').value,
-                polygon_area_validation: document.getElementById('polygon_area_validation').value,
-                polygon_validation: document.getElementById('polygon_validation').value,
+                brand_validation: getRadioValue('brand_validation'),
+                polygon_area_validation: getRadioValue('polygon_area_validation'),
+                polygon_validation: getRadioValue('polygon_validation'),
                 comments: document.getElementById('comments').value,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                validator_name: validatorName
             };
 
             try {
@@ -1622,7 +1983,7 @@
                 const result = await response.json();
                 if (result.success) {
                     validationData[currentPOI.poi_code] = validation;
-                    statusEl.textContent = 'Saved automatically';
+                    statusEl.textContent = 'Saved successfully';
                     statusEl.style.color = '#48bb78';
                     updateProgressDisplay();
                 } else {
@@ -1630,24 +1991,42 @@
                     statusEl.style.color = '#e53e3e';
                 }
             } catch (error) {
-                console.error('Error auto-saving validation:', error);
+                console.error('Error saving validation:', error);
                 statusEl.textContent = 'Error saving';
                 statusEl.style.color = '#e53e3e';
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
             }
         }
 
-        function triggerAutoSave(immediate) {
-            if (autoSaveTimer) clearTimeout(autoSaveTimer);
-            if (immediate) {
-                autoSaveValidation();
-            } else {
-                // Debounce for text input (comments)
-                autoSaveTimer = setTimeout(autoSaveValidation, 800);
+        function highlightRadio(radioInput) {
+            const group = radioInput.closest('.radio-group');
+            group.querySelectorAll('label').forEach(l => l.className = '');
+            const label = radioInput.closest('label');
+            label.className = radioInput.value === 'correct' ? 'selected-correct' : 'selected-incorrect';
+        }
+
+        function getRadioValue(name) {
+            const checked = document.querySelector(`input[name="${name}"]:checked`);
+            return checked ? checked.value : '';
+        }
+
+        function setRadioValue(name, value) {
+            const group = document.getElementById(name);
+            group.querySelectorAll('label').forEach(l => l.className = '');
+            group.querySelectorAll('input').forEach(r => r.checked = false);
+            if (value) {
+                const radio = group.querySelector(`input[value="${value}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.closest('label').className = value === 'correct' ? 'selected-correct' : 'selected-incorrect';
+                }
             }
         }
 
         function onPoiTypeValidationChange() {
-            const val = document.getElementById('poi_type_validation').value;
+            const val = getRadioValue('poi_type_validation');
             const field = document.getElementById('correct_poi_type_field');
             if (val === 'incorrect') {
                 field.style.display = 'block';
@@ -1661,11 +2040,6 @@
         }
 
         function setupAutoSaveListeners() {
-            document.getElementById('poi_type_validation').addEventListener('change', () => triggerAutoSave(true));
-            document.getElementById('brand_validation').addEventListener('change', () => triggerAutoSave(true));
-            document.getElementById('polygon_area_validation').addEventListener('change', () => triggerAutoSave(true));
-            document.getElementById('polygon_validation').addEventListener('change', () => triggerAutoSave(true));
-            document.getElementById('comments').addEventListener('input', () => triggerAutoSave(false));
             setupPoiTypeSearch();
         }
         
@@ -1711,7 +2085,6 @@
                         hiddenInput.value = selectedType;
                         descDiv.textContent = poiTypeDescriptions[selectedType] || '';
                         dropdown.style.display = 'none';
-                        triggerAutoSave(true);
                     });
                 });
             });
@@ -1797,16 +2170,30 @@
         function showValidationView() {
             document.getElementById('validationView').style.display = 'block';
             document.getElementById('analyticsView').style.display = 'none';
+            document.getElementById('summaryView').style.display = 'none';
             document.getElementById('navValidation').classList.add('active');
             document.getElementById('navAnalytics').classList.remove('active');
+            document.getElementById('navSummary').classList.remove('active');
         }
 
         function showAnalyticsView() {
             document.getElementById('validationView').style.display = 'none';
             document.getElementById('analyticsView').style.display = 'block';
+            document.getElementById('summaryView').style.display = 'none';
             document.getElementById('navValidation').classList.remove('active');
             document.getElementById('navAnalytics').classList.add('active');
+            document.getElementById('navSummary').classList.remove('active');
             loadAnalytics();
+        }
+
+        function showSummaryView() {
+            document.getElementById('validationView').style.display = 'none';
+            document.getElementById('analyticsView').style.display = 'none';
+            document.getElementById('summaryView').style.display = 'block';
+            document.getElementById('navValidation').classList.remove('active');
+            document.getElementById('navAnalytics').classList.remove('active');
+            document.getElementById('navSummary').classList.add('active');
+            loadSummary();
         }
 
         async function loadAnalytics() {
@@ -1854,8 +2241,8 @@
                     <div class="stat-label">Untested</div>
                 </div>
                 <div class="stat-card red">
-                    <div class="stat-number">${stats.poi_type.incorrect + stats.brand.incorrect + stats.polygon_area.incorrect + stats.polygon.incorrect}</div>
-                    <div class="stat-label">Total Incorrect</div>
+                    <div class="stat-number">${stats.total_incorrect_pois}</div>
+                    <div class="stat-label">Total Incorrect POIs</div>
                 </div>
             `;
 
@@ -1881,6 +2268,95 @@
                     </div>
                 `).join('');
             }
+
+            // Tester Analytics table
+            renderTesterTable();
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return '-';
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            if (m > 60) {
+                const h = Math.floor(m / 60);
+                const rm = m % 60;
+                return `${h}h ${rm}m`;
+            }
+            return m > 0 ? `${m}m ${s}s` : `${s}s`;
+        }
+
+        function renderTesterTable() {
+            const container = document.getElementById('testerTableContainer');
+            const testers = analyticsData.tester_stats || [];
+
+            if (testers.length === 0) {
+                container.innerHTML = '<div style="color:#718096; padding:20px; text-align:center;">No tester data available yet.</div>';
+                return;
+            }
+
+            let totalPois = 0, totalCorrect = 0, totalIncorrect = 0;
+            let totalPtC = 0, totalPtI = 0, totalBrC = 0, totalBrI = 0;
+            let totalPaC = 0, totalPaI = 0, totalPgC = 0, totalPgI = 0;
+
+            testers.forEach(t => {
+                totalPois += t.pois_tested;
+                totalCorrect += t.all_correct;
+                totalIncorrect += t.any_incorrect;
+                totalPtC += t.poi_type.correct; totalPtI += t.poi_type.incorrect;
+                totalBrC += t.brand.correct; totalBrI += t.brand.incorrect;
+                totalPaC += t.polygon_area.correct; totalPaI += t.polygon_area.incorrect;
+                totalPgC += t.polygon.correct; totalPgI += t.polygon.incorrect;
+            });
+
+            const rows = testers.map(t => `
+                <tr>
+                    <td>${escapeHtml(t.name)}</td>
+                    <td>${t.pois_tested}</td>
+                    <td class="correct-val">${t.all_correct}</td>
+                    <td class="incorrect-val">${t.any_incorrect}</td>
+                    <td><span class="correct-val">${t.poi_type.correct}</span> / <span class="incorrect-val">${t.poi_type.incorrect}</span></td>
+                    <td><span class="correct-val">${t.brand.correct}</span> / <span class="incorrect-val">${t.brand.incorrect}</span></td>
+                    <td><span class="correct-val">${t.polygon_area.correct}</span> / <span class="incorrect-val">${t.polygon_area.incorrect}</span></td>
+                    <td><span class="correct-val">${t.polygon.correct}</span> / <span class="incorrect-val">${t.polygon.incorrect}</span></td>
+                    <td class="time-val">${t.start_time || '-'}</td>
+                    <td class="time-val">${t.end_time || '-'}</td>
+                    <td>${formatDuration(t.avg_seconds_per_poi)}</td>
+                </tr>
+            `).join('');
+
+            container.innerHTML = `
+                <table class="tester-table">
+                    <thead>
+                        <tr>
+                            <th>Tester</th>
+                            <th>POIs Tested</th>
+                            <th>All Correct</th>
+                            <th>Any Incorrect</th>
+                            <th>POI Type (C/I)</th>
+                            <th>Brand (C/I)</th>
+                            <th>Poly Area (C/I)</th>
+                            <th>Polygon (C/I)</th>
+                            <th>Start Time (UTC)</th>
+                            <th>End Time (UTC)</th>
+                            <th>Avg Time/POI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                        <tr style="font-weight:700; background:#edf2f7; border-top:2px solid #4472C4;">
+                            <td>TOTAL</td>
+                            <td>${totalPois}</td>
+                            <td class="correct-val">${totalCorrect}</td>
+                            <td class="incorrect-val">${totalIncorrect}</td>
+                            <td><span class="correct-val">${totalPtC}</span> / <span class="incorrect-val">${totalPtI}</span></td>
+                            <td><span class="correct-val">${totalBrC}</span> / <span class="incorrect-val">${totalBrI}</span></td>
+                            <td><span class="correct-val">${totalPaC}</span> / <span class="incorrect-val">${totalPaI}</span></td>
+                            <td><span class="correct-val">${totalPgC}</span> / <span class="incorrect-val">${totalPgI}</span></td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
         }
 
         function escapeHtml(text) {
@@ -1988,6 +2464,66 @@
             showAnalyticsView();
             initApp();
             setupAutoSaveListeners();
+        }
+
+        function enterSummary() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            showSummaryView();
+            initApp();
+            setupAutoSaveListeners();
+        }
+
+        async function loadSummary() {
+            try {
+                const response = await fetch('/api/summary');
+                const data = await response.json();
+
+                renderSummaryTable('summaryPoiType', data.poi_type_validation);
+                renderSummaryTable('summaryBrand', data.brand_validation);
+                renderSummaryTable('summaryPolygonArea', data.polygon_area_validation);
+                renderSummaryTable('summaryPolygon', data.polygon_validation);
+            } catch (err) {
+                console.error('Error loading summary:', err);
+            }
+        }
+
+        function renderSummaryTable(containerId, items) {
+            const container = document.getElementById(containerId);
+
+            if (!items || items.length === 0) {
+                container.innerHTML = '<div style="color:#718096; padding:15px; text-align:center;">No incorrect validations found.</div>';
+                return;
+            }
+
+            const maxIncorrect = items[0].incorrect;
+
+            const rows = items.map((item, i) => {
+                const barWidth = maxIncorrect > 0 ? Math.round((item.incorrect / maxIncorrect) * 100) : 0;
+                const pct = item.total_validated > 0 ? Math.round((item.incorrect / item.total_validated) * 100) : 0;
+                return `<tr>
+                    <td class="rank-col">${i + 1}</td>
+                    <td style="text-align:left;">${escapeHtml(item.poi_type)}</td>
+                    <td><span class="incorrect-bar" style="width:${barWidth}px;"></span>${item.incorrect}</td>
+                    <td>${item.total_validated}</td>
+                    <td style="color:${pct >= 50 ? '#e53e3e' : '#718096'}; font-weight:600;">${pct}%</td>
+                </tr>`;
+            }).join('');
+
+            container.innerHTML = `
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th style="text-align:left;">POI Type</th>
+                            <th>Incorrect</th>
+                            <th>Validated</th>
+                            <th>Error Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
         }
     </script>
 </body>

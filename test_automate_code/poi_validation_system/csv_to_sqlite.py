@@ -111,7 +111,8 @@ def create_database(db_path):
             polygon_area_validation TEXT DEFAULT '',
             polygon_validation TEXT DEFAULT '',
             comments TEXT DEFAULT '',
-            timestamp TEXT DEFAULT ''
+            timestamp TEXT DEFAULT '',
+            validator_name TEXT DEFAULT ''
         )
     """)
 
@@ -232,8 +233,8 @@ def import_validations_json(conn, json_path):
         conn.execute("""
             INSERT OR REPLACE INTO validations
             (poi_code, poi_type_validation, correct_poi_type, brand_validation,
-             polygon_area_validation, polygon_validation, comments, timestamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             polygon_area_validation, polygon_validation, comments, timestamp, validator_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             poi_code,
             v.get('poi_type_validation', ''),
@@ -242,7 +243,8 @@ def import_validations_json(conn, json_path):
             v.get('polygon_area_validation', ''),
             v.get('polygon_validation', ''),
             v.get('comments', ''),
-            v.get('timestamp', '')
+            v.get('timestamp', ''),
+            v.get('validator_name', '')
         ))
 
     conn.commit()

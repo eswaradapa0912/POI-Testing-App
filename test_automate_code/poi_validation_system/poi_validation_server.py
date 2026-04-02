@@ -27,6 +27,9 @@ BASE_DIR = Path("/mnt/data/POI_Testing_Automation/version=5_0_2/test_automate_co
 DB_PATH = BASE_DIR / "poi_data.db"
 SCREENSHOTS_DISPLAY = BASE_DIR / "output" / "screenshots_with_display"
 SCREENSHOTS_KEPLER = BASE_DIR / "output" / "screenshots_kepler"
+# Country-specific screenshot directories (India, UAE, etc.)
+SCREENSHOTS_DISPLAY_IND = BASE_DIR / "output" / "IND" / "screenshots_with_display"
+SCREENSHOTS_KEPLER_IND = BASE_DIR / "output" / "IND" / "screenshots_kepler"
 CONFIG_FILE = BASE_DIR / "config.json"
 EXCEL_OUTPUT = BASE_DIR / "output" / "poi_validation_report.xlsx"
 GOOGLE_SHEETS_CSV = BASE_DIR / "output" / "poi_validation_google_sheets.csv"
@@ -60,6 +63,19 @@ def get_db():
     return conn
 
 
+def migrate_db():
+    """Add missing columns to existing database"""
+    conn = get_db()
+    try:
+        columns = [row['name'] for row in conn.execute("PRAGMA table_info(validations)").fetchall()]
+        if 'validator_name' not in columns:
+            conn.execute("ALTER TABLE validations ADD COLUMN validator_name TEXT DEFAULT ''")
+            conn.commit()
+            print("Migration: added validator_name column to validations table")
+    finally:
+        conn.close()
+
+
 def safe_parse_list(value):
     """Safely parse list strings from DB"""
     if value is None or value == '' or value == 'nan':
@@ -75,11 +91,17 @@ def safe_parse_list(value):
 
 
 def find_screenshot(poi_code, screenshot_dir):
-    """Find screenshot file for given POI code"""
+    """Find screenshot file for given POI code, checking country-specific dirs too"""
     pattern = f"{poi_code}*.png"
     files = list(screenshot_dir.glob(pattern))
     if files:
         return files[0].name
+    # Check country-specific directories (IND, etc.)
+    country_dir = screenshot_dir.parent / "IND" / screenshot_dir.name
+    if country_dir.exists():
+        files = list(country_dir.glob(pattern))
+        if files:
+            return files[0].name
     return None
 
 
@@ -176,34 +198,31 @@ def get_poi_list():
 
     conn = get_db()
     try:
-        query = "SELECT poi_code, name FROM poi_input WHERE 1=1"
-        params = []
+        # First get ALL POIs sorted by poi_code (for consistent round-robin)
+        all_rows = conn.execute("SELECT poi_code, name, poi_type, country FROM poi_input ORDER BY poi_code").fetchall()
+        all_pois = [{'poi_code': r['poi_code'], 'name': r['name'] or 'Unknown',
+                     'poi_type': r['poi_type'] or '', 'country': r['country'] or ''} for r in all_rows]
 
-        if country:
-            query += " AND country = ?"
-            params.append(country)
-
-        if level1:
-            query += " AND poi_type LIKE ?"
-            params.append(f"{level1}.%")
-
-        if poi_type:
-            query += " AND poi_type = ?"
-            params.append(poi_type)
-
-        query += " ORDER BY poi_code"
-        rows = conn.execute(query, params).fetchall()
-
-        poi_list = [{'poi_code': r['poi_code'], 'name': r['name'] or 'Unknown'} for r in rows]
-
-        # Apply assignee split
+        # Apply assignee round-robin FIRST (on the full list)
         if assignee:
             config = load_config()
             assignees = config.get('assignees', [])
             if assignees and assignee in assignees:
                 assignee_index = assignees.index(assignee)
                 num_assignees = len(assignees)
-                poi_list = [p for i, p in enumerate(poi_list) if i % num_assignees == assignee_index]
+                all_pois = [p for i, p in enumerate(all_pois) if i % num_assignees == assignee_index]
+
+        # Then apply filters on the assignee's fixed set
+        poi_list = all_pois
+        if country:
+            poi_list = [p for p in poi_list if p['country'] == country]
+        if level1:
+            poi_list = [p for p in poi_list if p['poi_type'].startswith(f"{level1}.")]
+        if poi_type:
+            poi_list = [p for p in poi_list if p['poi_type'] == poi_type]
+
+        # Strip extra fields before returning
+        poi_list = [{'poi_code': p['poi_code'], 'name': p['name']} for p in poi_list]
 
         return jsonify({'poi_list': poi_list})
     finally:
@@ -254,18 +273,22 @@ def get_poi_data(poi_code):
 
 @app.route('/api/screenshot/display/<path:filename>')
 def serve_screenshot_display(filename):
-    """Serve screenshot files from display directory"""
+    """Serve screenshot files from display directory (checks USA then IND)"""
     if (SCREENSHOTS_DISPLAY / filename).exists():
         return send_from_directory(SCREENSHOTS_DISPLAY, filename)
+    elif (SCREENSHOTS_DISPLAY_IND / filename).exists():
+        return send_from_directory(SCREENSHOTS_DISPLAY_IND, filename)
     else:
         return jsonify({'error': 'Display screenshot not found'}), 404
 
 
 @app.route('/api/screenshot/kepler/<path:filename>')
 def serve_screenshot_kepler(filename):
-    """Serve screenshot files from kepler directory"""
+    """Serve screenshot files from kepler directory (checks USA then IND)"""
     if (SCREENSHOTS_KEPLER / filename).exists():
         return send_from_directory(SCREENSHOTS_KEPLER, filename)
+    elif (SCREENSHOTS_KEPLER_IND / filename).exists():
+        return send_from_directory(SCREENSHOTS_KEPLER_IND, filename)
     else:
         return jsonify({'error': 'Kepler screenshot not found'}), 404
 
@@ -286,7 +309,8 @@ def get_validations():
                 'polygon_area_validation': r['polygon_area_validation'] or '',
                 'polygon_validation': r['polygon_validation'] or '',
                 'comments': r['comments'] or '',
-                'timestamp': r['timestamp'] or ''
+                'timestamp': r['timestamp'] or '',
+                'validator_name': r['validator_name'] or ''
             }
         return jsonify(validations)
     finally:
@@ -308,8 +332,8 @@ def save_validation():
             conn.execute("""
                 INSERT OR REPLACE INTO validations
                 (poi_code, poi_type_validation, correct_poi_type, brand_validation,
-                 polygon_area_validation, polygon_validation, comments, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 polygon_area_validation, polygon_validation, comments, timestamp, validator_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 poi_code,
                 validation_data.get('poi_type_validation', ''),
@@ -318,7 +342,8 @@ def save_validation():
                 validation_data.get('polygon_area_validation', ''),
                 validation_data.get('polygon_validation', ''),
                 validation_data.get('comments', ''),
-                validation_data.get('timestamp', '')
+                validation_data.get('timestamp', ''),
+                validation_data.get('validator_name', '')
             ))
             conn.commit()
         finally:
@@ -380,6 +405,7 @@ def update_excel_report():
         df['polygon_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_validation', ''))
         df['validation_comments'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('comments', ''))
         df['validation_timestamp'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('timestamp', ''))
+        df['validator_name'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('validator_name', ''))
 
         with pd.ExcelWriter(EXCEL_OUTPUT, engine='openpyxl') as writer:
             df.to_excel(writer, sheet_name='POI Validation Data', index=False)
@@ -477,7 +503,7 @@ def update_google_sheets_csv():
         df['polygon_validation'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('polygon_validation', ''))
         df['validation_comments'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('comments', ''))
         df['validation_timestamp'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('timestamp', ''))
-        df['validator_name'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('validator', 'System'))
+        df['validator_name'] = df['poi_code'].map(lambda x: validations.get(x, {}).get('validator_name', ''))
 
         google_sheets_columns = [
             'poi_code', 'name', 'address', 'district_code', 'country',
@@ -526,6 +552,7 @@ def get_analytics():
         def compute_stats(poi_codes):
             total = len(poi_codes)
             tested = 0
+            pois_with_incorrect = 0
             stats = {
                 'total': total,
                 'poi_type': {'correct': 0, 'incorrect': 0, 'untested': 0},
@@ -541,6 +568,7 @@ def get_analytics():
                 if has_any:
                     tested += 1
 
+                has_incorrect = False
                 for key, field in [('poi_type', 'poi_type_validation'), ('brand', 'brand_validation'),
                                    ('polygon_area', 'polygon_area_validation'), ('polygon', 'polygon_validation')]:
                     val = v.get(field, '')
@@ -548,8 +576,12 @@ def get_analytics():
                         stats[key]['correct'] += 1
                     elif val == 'incorrect':
                         stats[key]['incorrect'] += 1
+                        has_incorrect = True
                     else:
                         stats[key]['untested'] += 1
+
+                if has_incorrect:
+                    pois_with_incorrect += 1
 
                 comment = (v.get('comments') or '').strip()
                 if comment:
@@ -563,20 +595,149 @@ def get_analytics():
 
             stats['tested'] = tested
             stats['untested_count'] = total - tested
+            stats['total_incorrect_pois'] = pois_with_incorrect
             return stats
 
         overall = compute_stats(all_poi_codes)
 
         per_assignee = {}
         if assignees:
-            for i, assignee in enumerate(assignees):
-                assignee_codes = [all_poi_codes[j] for j in range(len(all_poi_codes)) if j % len(assignees) == i]
+            for assignee in assignees:
+                assignee_codes = [pc for pc in all_poi_codes
+                                  if validations.get(pc, {}).get('validator_name', '') == assignee]
                 per_assignee[assignee] = compute_stats(assignee_codes)
+
+        # Tester analytics: per-validator stats based on actual validator_name
+        from datetime import datetime
+        tester_stats = []
+        # Group validations by validator_name
+        validators_map = {}
+        for pc, v in validations.items():
+            vname = v.get('validator_name', '')
+            if not vname:
+                continue
+            if vname not in validators_map:
+                validators_map[vname] = []
+            validators_map[vname].append(v)
+
+        for vname in sorted(validators_map.keys()):
+            v_list = validators_map[vname]
+            pois_tested = len(v_list)
+
+            poi_type_correct = sum(1 for v in v_list if v.get('poi_type_validation') == 'correct')
+            poi_type_incorrect = sum(1 for v in v_list if v.get('poi_type_validation') == 'incorrect')
+            brand_correct = sum(1 for v in v_list if v.get('brand_validation') == 'correct')
+            brand_incorrect = sum(1 for v in v_list if v.get('brand_validation') == 'incorrect')
+            polygon_area_correct = sum(1 for v in v_list if v.get('polygon_area_validation') == 'correct')
+            polygon_area_incorrect = sum(1 for v in v_list if v.get('polygon_area_validation') == 'incorrect')
+            polygon_correct = sum(1 for v in v_list if v.get('polygon_validation') == 'correct')
+            polygon_incorrect = sum(1 for v in v_list if v.get('polygon_validation') == 'incorrect')
+
+            # POI-level correct/incorrect
+            all_correct = 0
+            any_incorrect = 0
+            for v in v_list:
+                fields = [v.get('poi_type_validation', ''), v.get('brand_validation', ''),
+                          v.get('polygon_area_validation', ''), v.get('polygon_validation', '')]
+                filled = [f for f in fields if f]
+                if filled and all(f == 'correct' for f in filled):
+                    all_correct += 1
+                if any(f == 'incorrect' for f in fields):
+                    any_incorrect += 1
+
+            # Timestamps
+            timestamps = []
+            for v in v_list:
+                ts = v.get('timestamp', '')
+                if ts:
+                    try:
+                        timestamps.append(datetime.fromisoformat(ts.replace('Z', '+00:00')))
+                    except:
+                        pass
+
+            start_time = ''
+            end_time = ''
+            avg_seconds = 0
+            if timestamps:
+                timestamps.sort()
+                start_time = timestamps[0].strftime('%Y-%m-%d %H:%M:%S UTC')
+                end_time = timestamps[-1].strftime('%Y-%m-%d %H:%M:%S UTC')
+                if pois_tested > 1:
+                    total_seconds = (timestamps[-1] - timestamps[0]).total_seconds()
+                    avg_seconds = round(total_seconds / (pois_tested - 1))
+
+            tester_stats.append({
+                'name': vname,
+                'pois_tested': pois_tested,
+                'all_correct': all_correct,
+                'any_incorrect': any_incorrect,
+                'poi_type': {'correct': poi_type_correct, 'incorrect': poi_type_incorrect},
+                'brand': {'correct': brand_correct, 'incorrect': brand_incorrect},
+                'polygon_area': {'correct': polygon_area_correct, 'incorrect': polygon_area_incorrect},
+                'polygon': {'correct': polygon_correct, 'incorrect': polygon_incorrect},
+                'start_time': start_time,
+                'end_time': end_time,
+                'avg_seconds_per_poi': avg_seconds
+            })
 
         return jsonify({
             'overall': overall,
             'per_assignee': per_assignee,
-            'assignees': assignees
+            'assignees': assignees,
+            'tester_stats': sorted(tester_stats, key=lambda t: t['pois_tested'], reverse=True)
+        })
+    finally:
+        conn.close()
+
+
+@app.route('/api/summary')
+def get_summary():
+    """Get summary data: which poi_types have the most incorrect validations"""
+    conn = get_db()
+    try:
+        # Join poi_input with validations to get poi_type per validation
+        rows = conn.execute("""
+            SELECT i.poi_type, v.poi_type_validation, v.brand_validation,
+                   v.polygon_area_validation, v.polygon_validation
+            FROM poi_input i
+            INNER JOIN validations v ON i.poi_code = v.poi_code
+            WHERE i.poi_type IS NOT NULL
+        """).fetchall()
+
+        # Count incorrects per poi_type for each validation field
+        poi_type_incorrect = {}
+        brand_incorrect = {}
+        polygon_area_incorrect = {}
+        polygon_incorrect = {}
+
+        # Also count totals per poi_type for context
+        poi_type_totals = {}
+
+        for r in rows:
+            pt = r['poi_type']
+            poi_type_totals[pt] = poi_type_totals.get(pt, 0) + 1
+
+            if r['poi_type_validation'] == 'incorrect':
+                poi_type_incorrect[pt] = poi_type_incorrect.get(pt, 0) + 1
+            if r['brand_validation'] == 'incorrect':
+                brand_incorrect[pt] = brand_incorrect.get(pt, 0) + 1
+            if r['polygon_area_validation'] == 'incorrect':
+                polygon_area_incorrect[pt] = polygon_area_incorrect.get(pt, 0) + 1
+            if r['polygon_validation'] == 'incorrect':
+                polygon_incorrect[pt] = polygon_incorrect.get(pt, 0) + 1
+
+        def to_ranked_list(counts_dict):
+            return sorted(
+                [{'poi_type': k, 'incorrect': v, 'total_validated': poi_type_totals.get(k, 0)}
+                 for k, v in counts_dict.items()],
+                key=lambda x: x['incorrect'], reverse=True
+            )
+
+        return jsonify({
+            'poi_type_validation': to_ranked_list(poi_type_incorrect),
+            'brand_validation': to_ranked_list(brand_incorrect),
+            'polygon_area_validation': to_ranked_list(polygon_area_incorrect),
+            'polygon_validation': to_ranked_list(polygon_incorrect)
         })
     finally:
         conn.close()
@@ -605,23 +766,19 @@ def get_filtered_pois():
         all_pois = conn.execute("SELECT poi_code, name FROM poi_input ORDER BY poi_code").fetchall()
         poi_list = [{'poi_code': r['poi_code'], 'name': r['name'] or 'Unknown'} for r in all_pois]
 
-        # Apply assignee filter
-        if assignee:
-            config = load_config()
-            assignees = config.get('assignees', [])
-            if assignees and assignee in assignees:
-                idx = assignees.index(assignee)
-                n = len(assignees)
-                poi_list = [p for i, p in enumerate(poi_list) if i % n == idx]
-
         # Get validations
         val_rows = conn.execute("SELECT * FROM validations").fetchall()
         validations = {r['poi_code']: dict(r) for r in val_rows}
 
-        # Filter by validation field + value
+        # Filter by validation field + value, and optionally by assignee
         filtered = []
         for p in poi_list:
             v = validations.get(p['poi_code'], {})
+
+            # Filter by assignee (actual validator)
+            if assignee and v.get('validator_name', '') != assignee:
+                continue
+
             val = v.get(field, '')
             if value == 'untested':
                 if not val:
@@ -788,6 +945,7 @@ def proxy_node_modules(path):
 
 if __name__ == '__main__':
     (BASE_DIR / "output").mkdir(exist_ok=True)
+    migrate_db()
 
     print(f"Starting POI Validation Server...")
     print(f"Base directory: {BASE_DIR}")

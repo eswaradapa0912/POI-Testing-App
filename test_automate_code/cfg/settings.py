@@ -6,7 +6,7 @@ import os
 
 # --- Paths ---
 BASE_DIR        = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INPUT_CSV       = os.path.join(BASE_DIR, "input", "usa_sample - usa_sample.csv")
+INPUT_CSV       = os.path.join(BASE_DIR,"poi_validation_system", "input", "usa_sample - usa_sample.csv")
 DISTRICT_MAP    = os.path.join(BASE_DIR, "input", "Districts.csv")
 CATEGORY_MAP    = "" # os.path.join(BASE_DIR, "input", "category_poi_mapping.csv")
 OUTPUT_CSV      = os.path.join(BASE_DIR, "poi_validation_system", "output", "poi_extracted.csv")
