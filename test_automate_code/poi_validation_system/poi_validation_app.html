@@ -184,6 +184,16 @@
             padding-bottom: 10px;
         }
         
+        .fields-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .fields-row .info-field {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         .info-field {
             margin-bottom: 15px;
             display: flex;
@@ -227,7 +237,6 @@
             border: 2px solid #f39c12;
             border-radius: 12px;
             padding: 20px;
-            margin-top: 20px;
         }
         
         .validation-section h3 {
@@ -954,23 +963,6 @@
         </div>
         
         <div class="content" id="content" style="display: none;">
-            <div class="screenshots">
-                <div class="screenshot-container">
-                    <h3>Screenshot with Display</h3>
-                    <img id="screenshotDisplay" src="" alt="Screenshot with display" onclick="openModal(this)">
-                </div>
-                <div class="screenshot-container">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h3 style="margin-bottom: 0;">Screenshot Kepler</h3>
-                        <button class="btn-kepler" id="btnViewKepler" onclick="openKeplerForCurrentPOI()">
-                            <span id="keplerBtnText">View Live Kepler</span>
-                            <span id="keplerSpinner" style="display:none;" class="kepler-spinner"></span>
-                        </button>
-                    </div>
-                    <img id="screenshotKepler" src="" alt="Screenshot kepler" onclick="openModal(this)">
-                </div>
-            </div>
-            
             <div class="info-section">
                 <div class="section-card">
                     <h2>Generic Information</h2>
@@ -986,40 +978,44 @@
                         <label>Address:</label>
                         <div class="value" id="address"></div>
                     </div>
-                    <div class="info-field">
-                        <label>District Code:</label>
-                        <div class="value" id="district_code"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Country:</label>
-                        <div class="value" id="country"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Lat-Long:</label>
-                        <div class="value" id="latlong"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>District Code:</label>
+                            <div class="value" id="district_code"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Country:</label>
+                            <div class="value" id="country"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Lat-Long:</label>
+                            <div class="value" id="latlong"></div>
+                        </div>
                     </div>
                     <div class="info-field">
                         <label>Google Maps URL:</label>
                         <div class="value"><a id="gmaps_url" href="" target="_blank" class="link">View on Google Maps</a></div>
                     </div>
                 </div>
-                
+
                 <div class="section-card">
                     <h2>Brand Information</h2>
-                    <div class="info-field">
-                        <label>Brands:</label>
-                        <div class="value" id="brands"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Brand Method:</label>
-                        <div class="value" id="brand_method"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Website Domain:</label>
-                        <div class="value" id="website_domain_name"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>Brands:</label>
+                            <div class="value" id="brands"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Brand Method:</label>
+                            <div class="value" id="brand_method"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Website Domain:</label>
+                            <div class="value" id="website_domain_name"></div>
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="section-card">
                     <h2>POI Type Information</h2>
                     <div class="info-field">
@@ -1035,60 +1031,85 @@
                         <label>POI Type Cumulative:</label>
                         <div class="value" id="poi_type_cumulative"></div>
                     </div>
-                    <div class="info-field">
-                        <label>Final POI Type (DistilBERT):</label>
-                        <div class="value" id="final_poitype_distilbert"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Confidence (DistilBERT):</label>
-                        <div class="value" id="final_confidence_distilbert"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>Final POI Type (DistilBERT):</label>
+                            <div class="value" id="final_poitype_distilbert"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Confidence (DistilBERT):</label>
+                            <div class="value" id="final_confidence_distilbert"></div>
+                        </div>
                     </div>
                     <div class="info-field">
                         <label>Google Category Tags:</label>
                         <div class="value" id="google_category_tags"></div>
                     </div>
                 </div>
-                
+
                 <div class="section-card">
                     <h2>Polygon Information</h2>
                     <div class="info-field">
                         <label>Area Tag:</label>
                         <div class="value" id="area_tag"></div>
                     </div>
-                    <div class="info-field">
-                        <label>Polygon Area (sqm):</label>
-                        <div class="value" id="polygon_area_sqm"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Parent Polygon Area (sqm):</label>
-                        <div class="value" id="parent_polygon_area_sqm"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>Polygon Area (sqm):</label>
+                            <div class="value" id="polygon_area_sqm"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Parent Polygon Area (sqm):</label>
+                            <div class="value" id="parent_polygon_area_sqm"></div>
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="section-card">
                     <h2>Matching Metrics</h2>
-                    <div class="info-field">
-                        <label>Name Match:</label>
-                        <div class="value" id="name_match_pct"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>Name Match:</label>
+                            <div class="value" id="name_match_pct"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Address Match:</label>
+                            <div class="value" id="address_match_pct"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Ratings Difference:</label>
+                            <div class="value" id="ratings_diff"></div>
+                        </div>
                     </div>
-                    <div class="info-field">
-                        <label>Address Match:</label>
-                        <div class="value" id="address_match_pct"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Distance from LatLong (m):</label>
-                        <div class="value" id="distance_from_latlong_m"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Location Status Match:</label>
-                        <div class="value" id="location_status_match"></div>
-                    </div>
-                    <div class="info-field">
-                        <label>Ratings Difference:</label>
-                        <div class="value" id="ratings_diff"></div>
+                    <div class="fields-row">
+                        <div class="info-field">
+                            <label>Distance from LatLong (m):</label>
+                            <div class="value" id="distance_from_latlong_m"></div>
+                        </div>
+                        <div class="info-field">
+                            <label>Location Status Match:</label>
+                            <div class="value" id="location_status_match"></div>
+                        </div>
                     </div>
                 </div>
-                
+            </div>
+
+            <div class="screenshots">
+                <div class="screenshot-container">
+                    <h3>Screenshot with Display</h3>
+                    <img id="screenshotDisplay" src="" alt="Screenshot with display" onclick="openModal(this)">
+                </div>
+                <div class="screenshot-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin-bottom: 0;">Screenshot Kepler</h3>
+                        <button class="btn-kepler" id="btnViewKepler" onclick="openKeplerForCurrentPOI()">
+                            <span id="keplerBtnText">View Live Kepler</span>
+                            <span id="keplerSpinner" style="display:none;" class="kepler-spinner"></span>
+                        </button>
+                    </div>
+                    <img id="screenshotKepler" src="" alt="Screenshot kepler" onclick="openModal(this)">
+                </div>
+
                 <div class="validation-section">
                     <h3>Validation</h3>
                     <div class="validation-field">
